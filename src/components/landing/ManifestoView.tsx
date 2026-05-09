@@ -147,7 +147,8 @@ const sections: Section[] = [
         We have the research. We have the architecture. We have the traction. We
         are not waiting for AGI to arrive and hoping it solves enterprise. We
         are building the intelligence layer that makes AGI useful for
-        organizations.
+        organizations. Sentra is{" "}
+        <span className="mb-egi">Enterprise General Intelligence</span>.
       </>,
     ],
   },
@@ -163,9 +164,6 @@ export function ManifestoView() {
     >
       <div className="container">
         <h1 className="sec-h">The Sentra Manifesto</h1>
-        <p className="mb-subtitle">
-          <span className="mb-egi">Enterprise General Intelligence</span>
-        </p>
 
         <p className="rh-lede">
           Every organization runs on intelligence: the decisions made in

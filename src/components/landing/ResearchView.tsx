@@ -1,8 +1,7 @@
 type Paper = {
-  tag: string;
   title: string;
-  subtitle: string;
-  read: string;
+  authors: string;
+  venue: string;
   href: string;
 };
 
@@ -89,45 +88,39 @@ const acts: Act[] = [
 
 const papers: Paper[] = [
   {
-    tag: "Plain English",
-    title: "The geometry of forgetting",
-    subtitle: "Why AI memory forgets",
-    read: "6 min read",
+    title: "The Geometry of Forgetting",
+    authors: "Sambartha Ray Barman, Andrey Starenky, Ashwin Gopinath",
+    venue: "Sentra Research · 2026—04",
     href: "#",
   },
   {
-    tag: "Research result",
-    title: "The price of meaning",
-    subtitle: "Why meaning alone is not enough",
-    read: "8 min read",
+    title: "The Price of Meaning",
+    authors: "Sambartha Ray Barman, Sophia Bodnar, Ashwin Gopinath",
+    venue: "Sentra Research · 2026—04",
     href: "#",
   },
   {
-    tag: "Architecture",
-    title: "Semantic memory filesystem",
-    subtitle: "The engineering answer",
-    read: "10 min read",
+    title: "Semantic Memory Filesystem",
+    authors: "Andrey Starenky, Nikhil Narasimhan, Ashwin Gopinath",
+    venue: "Sentra Research · 2026—03",
     href: "#",
   },
   {
-    tag: "Control",
-    title: "Operational reinforcement",
-    subtitle: "How Sentra catches drift",
-    read: "7 min read",
+    title: "Operational Reinforcement",
+    authors: "Sophia Bodnar, Sambartha Ray Barman, Ashwin Gopinath",
+    venue: "Sentra Research · 2026—03",
     href: "#",
   },
   {
-    tag: "Alignment",
-    title: "Avoidance learning",
-    subtitle: "Alignment without reward hacking",
-    read: "9 min read",
+    title: "Avoidance Learning",
+    authors: "Nikhil Narasimhan, Andrey Starenky, Ashwin Gopinath",
+    venue: "Sentra Research · 2026—03",
     href: "#",
   },
   {
-    tag: "Efficiency",
-    title: "3% is all you need",
-    subtitle: "Structure beats brute force",
-    read: "5 min read",
+    title: "3% Is All You Need",
+    authors: "Sambartha Ray Barman, Ashwin Gopinath",
+    venue: "Sentra Research · 2026—04",
     href: "#",
   },
 ];
@@ -216,19 +209,20 @@ export function ResearchView() {
 
         <h2 className="rp-h">Publications</h2>
 
-        <div className="rp-grid">
+        <ul className="rp-list">
           {papers.map((p) => (
-            <a className="rp-card" href={p.href} key={p.title}>
-              <span className="rp-tag">{p.tag}</span>
-              <h3 className="rp-title">{p.title}</h3>
-              <p className="rp-subtitle">{p.subtitle}</p>
-              <div className="rp-foot">
-                <span className="rp-time">{p.read}</span>
+            <li key={p.title}>
+              <a className="rp-row" href={p.href}>
+                <div className="rp-row-main">
+                  <h3 className="rp-title">{p.title}</h3>
+                  <p className="rp-authors">{p.authors}</p>
+                  <p className="rp-venue">{p.venue}</p>
+                </div>
                 <Arrow />
-              </div>
-            </a>
+              </a>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
