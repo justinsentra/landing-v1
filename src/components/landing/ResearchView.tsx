@@ -90,37 +90,37 @@ const papers: Paper[] = [
   {
     title: "The Geometry of Forgetting",
     authors: "Sambartha Ray Barman, Andrey Starenky, Ashwin Gopinath",
-    venue: "Sentra Research · 2026—04",
+    venue: "2026—04",
     href: "#",
   },
   {
     title: "The Price of Meaning",
     authors: "Sambartha Ray Barman, Sophia Bodnar, Ashwin Gopinath",
-    venue: "Sentra Research · 2026—04",
+    venue: "2026—04",
     href: "#",
   },
   {
     title: "Semantic Memory Filesystem",
     authors: "Andrey Starenky, Nikhil Narasimhan, Ashwin Gopinath",
-    venue: "Sentra Research · 2026—03",
+    venue: "2026—03",
     href: "#",
   },
   {
     title: "Operational Reinforcement",
     authors: "Sophia Bodnar, Sambartha Ray Barman, Ashwin Gopinath",
-    venue: "Sentra Research · 2026—03",
+    venue: "2026—03",
     href: "#",
   },
   {
     title: "Avoidance Learning",
     authors: "Nikhil Narasimhan, Andrey Starenky, Ashwin Gopinath",
-    venue: "Sentra Research · 2026—03",
+    venue: "2026—03",
     href: "#",
   },
   {
     title: "3% Is All You Need",
     authors: "Sambartha Ray Barman, Ashwin Gopinath",
-    venue: "Sentra Research · 2026—04",
+    venue: "2026—04",
     href: "#",
   },
 ];

@@ -63,7 +63,6 @@ export default function ChiefOfStaff() {
               <div className="cos-vis">
                 <Image src={c.src} alt={c.alt} width={640} height={400} />
               </div>
-              <span className="label">{c.label}</span>
               <h3>{c.title}</h3>
               <p>{c.body}</p>
             </div>

@@ -19,6 +19,9 @@ importers:
       react-dom:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
+      simple-icons:
+        specifier: ^16.18.1
+        version: 16.18.1
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.5.0
@@ -2692,6 +2695,13 @@ packages:
       }
     engines: { node: ">= 0.4" }
 
+  simple-icons@16.18.1:
+    resolution:
+      {
+        integrity: sha512-+AS16pmdVHFdKrzYuTGfNGW6RRJ7eubpRhh2wipqPD5nglXKKIbAoEFhdxuweR1AV63+TuLXVJ+NEqlJpXXa2A==,
+      }
+    engines: { node: ">=0.12.18" }
+
   source-map-js@1.2.1:
     resolution:
       {
@@ -4691,6 +4701,8 @@ snapshots:
       side-channel-list: 1.0.1
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
+
+  simple-icons@16.18.1: {}
 
   source-map-js@1.2.1: {}
 
