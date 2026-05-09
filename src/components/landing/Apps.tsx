@@ -33,7 +33,7 @@ export default function Apps() {
 
         <div className="apps-foot">
           <p className="apps-foot-note">200+ tools and counting.</p>
-          <a className="apps-foot-link" href="#integrations">
+          <a className="apps-foot-link" href="/integrations">
             View all integrations
             <span className="apps-foot-arrow" aria-hidden="true">
               →

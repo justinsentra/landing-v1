@@ -20,7 +20,7 @@ const navLinks = [
   { href: "/blog", label: "Blog" },
 ];
 
-const LIGHT_ROUTES = ["/research", "/blog", "/manifesto"];
+const LIGHT_ROUTES = ["/research", "/blog", "/manifesto", "/demo"];
 
 export default function Nav() {
   const wrapRef = useRef<HTMLDivElement | null>(null);

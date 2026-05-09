@@ -1,16 +1,18 @@
-import { DarkBackdrop } from "./DarkBackdrop";
 import { DemoForm } from "./DemoForm";
 
 export function DemoView() {
   return (
-    <section className="demo" data-screen-label="Demo" data-nav-theme="dark">
-      <DarkBackdrop variant="final" />
-
-      <div className="demo-inner">
+    <section
+      className="section section--first"
+      id="demo"
+      data-screen-label="Demo"
+      data-nav-theme="light"
+    >
+      <div className="container">
         <div className="demo-grid">
           <div className="demo-left">
-            <h1 className="demo-h">Talk to our sales team.</h1>
-            <p className="demo-sub">
+            <h1 className="sec-h">Talk to our sales team</h1>
+            <p className="sec-sub">
               Connect with our sales team to explore how we can support your use
               case.
             </p>

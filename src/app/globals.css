@@ -608,6 +608,16 @@ button {
 .section#apps {
   padding-top: 96px;
 }
+/* Security heading was reading low between the apps-grid bleed-bottom and the
+   sec-grid bleed-top because the heading group is much taller than the sub.
+   Trim the section's own padding-top and bump the sec-grid margin-top so the
+   group's optical center lines up with the geometric center of the gap. */
+.section#security {
+  padding-top: 24px;
+}
+.section#security .sec-grid {
+  margin-top: 120px;
+}
 
 /* Full-bleed dashed line on the top/bottom of a contained box.
    Escapes the container width via 100vw + transform-centering.
@@ -2208,56 +2218,23 @@ section#apps {
 /* ──────────────────────────────────────────────────────────────────────────
    DEMO PAGE
    ────────────────────────────────────────────────────────────────────────── */
-.demo {
-  position: relative;
-  background: var(--hero-ink);
-  color: #eff1f4;
-  min-height: 100vh;
-  overflow: hidden;
-  isolation: isolate;
-}
-.demo-inner {
-  position: relative;
-  z-index: 4;
-  width: min(calc(100% - 2 * var(--gutter)), var(--container));
-  margin: 0 auto;
-  padding: 168px 0 96px;
-}
 .demo-grid {
+  margin-top: 56px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 96px;
   align-items: start;
 }
 @media (max-width: 980px) {
-  .demo-inner {
-    padding: 120px 0 64px;
-  }
   .demo-grid {
     grid-template-columns: 1fr;
     gap: 56px;
   }
 }
-.demo-h {
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: clamp(44px, 5.4vw, 72px);
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-  color: #fff;
-  text-wrap: balance;
-}
-.demo-sub {
-  margin-top: 20px;
-  font-size: 17px;
-  line-height: 1.55;
-  color: var(--ink-d-body);
-  max-width: 44ch;
-}
 .demo-quote {
   margin-top: 56px;
   padding-top: 28px;
-  border-top: 1px dashed var(--ink-d-edge);
+  border-top: 1px dashed var(--hairline-default);
   max-width: 48ch;
 }
 .demo-quote blockquote {
@@ -2265,12 +2242,12 @@ section#apps {
   font-size: clamp(20px, 1.8vw, 24px);
   line-height: 1.4;
   letter-spacing: -0.012em;
-  color: #fff;
+  color: var(--fg);
   font-weight: 400;
   font-style: normal;
 }
 .demo-quote figcaption {
-  margin-top: 24px;
+  margin-top: 20px;
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -2280,24 +2257,22 @@ section#apps {
   font-family: var(--sans);
   font-size: 15px;
   font-weight: 500;
-  color: #fff;
+  color: var(--fg);
 }
 .demo-quote-role {
   font-family: var(--sans);
   font-size: 14px;
   letter-spacing: -0.005em;
-  color: var(--ink-d-muted);
+  color: var(--muted);
 }
 
 .demo-form {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  border: 1px dashed var(--ink-d-edge);
+  border: 1px dashed var(--hairline-default);
   padding: 36px;
-  background: rgba(14, 14, 18, 0.4);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: var(--surface);
 }
 .demo-row-2 {
   display: grid;
@@ -2318,8 +2293,8 @@ section#apps {
   font-family: var(--sans);
   font-size: 13.5px;
   letter-spacing: -0.005em;
-  color: var(--ink-d-body);
-  font-weight: 400;
+  color: var(--fg);
+  font-weight: 500;
 }
 .demo-field input,
 .demo-field select,
@@ -2327,9 +2302,9 @@ section#apps {
   font-family: var(--sans);
   font-size: 15px;
   letter-spacing: -0.005em;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--ink-d-edge);
+  color: var(--fg);
+  background: #fff;
+  border: 1px solid var(--hairline-default);
   padding: 12px 14px;
   outline: none;
   width: 100%;
@@ -2345,31 +2320,30 @@ section#apps {
 }
 .demo-field input::placeholder,
 .demo-field textarea::placeholder {
-  color: var(--ink-d-faint);
+  color: var(--muted);
 }
 .demo-field input:hover,
 .demo-field select:hover,
 .demo-field textarea:hover {
-  border-color: rgba(239, 241, 244, 0.36);
+  border-color: var(--hairline-strong);
 }
 .demo-field input:focus,
 .demo-field select:focus,
 .demo-field textarea:focus {
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.06);
 }
 .demo-field select {
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1 6 6 11 1' stroke='%23c4c6cb' fill='none' stroke-width='1.4' stroke-linecap='round'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1 6 6 11 1' stroke='%23525252' fill='none' stroke-width='1.4' stroke-linecap='round'/></svg>");
   background-repeat: no-repeat;
   background-position: right 14px center;
   padding-right: 36px;
   cursor: pointer;
 }
 .demo-field select option {
-  background: var(--hero-ink);
-  color: #eff1f4;
+  background: #fff;
+  color: var(--fg);
 }
 .demo-submit {
   margin-top: 10px;
@@ -2386,9 +2360,7 @@ section#apps {
   background: var(--primary);
   border: none;
   cursor: pointer;
-  transition:
-    background var(--dur-fast) var(--ease),
-    transform var(--dur-fast) var(--ease);
+  transition: background var(--dur-fast) var(--ease);
 }
 .demo-submit:hover {
   background: var(--primary-deep);
@@ -2402,13 +2374,13 @@ section#apps {
   font-weight: 500;
   font-size: 32px;
   letter-spacing: -0.022em;
-  color: #fff;
+  color: var(--fg);
 }
 .demo-form-done p {
   margin-top: 8px;
   font-size: 15px;
   line-height: 1.55;
-  color: var(--ink-d-body);
+  color: var(--muted);
   max-width: 40ch;
 }
 

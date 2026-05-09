@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import Nav from "@/components/landing/Nav";
-import { DemoView } from "@/components/landing/DemoView";
+import { IntegrationsView } from "@/components/landing/IntegrationsView";
 import FinalCTA from "@/components/landing/FinalCTA";
 import { createMetadata } from "@/utils/metadata";
 
-export const metadata: Metadata = createMetadata({ canonical: "/demo" });
+export const metadata: Metadata = createMetadata({
+  canonical: "/integrations",
+});
 
-export default function DemoPage() {
+export default function IntegrationsPage() {
   return (
     <>
       <Nav />
-      <DemoView />
+      <IntegrationsView />
       <FinalCTA />
     </>
   );
