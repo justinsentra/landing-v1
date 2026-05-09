@@ -1,5 +1,7 @@
 type Paper = {
+  tag: string;
   title: string;
+  subtitle: string;
   read: string;
   href: string;
 };
@@ -86,12 +88,48 @@ const acts: Act[] = [
 ];
 
 const papers: Paper[] = [
-  { title: "The geometry of forgetting", read: "6 min read", href: "#" },
-  { title: "The price of meaning", read: "8 min read", href: "#" },
-  { title: "Semantic memory filesystem", read: "10 min read", href: "#" },
-  { title: "Operational reinforcement", read: "7 min read", href: "#" },
-  { title: "Avoidance learning", read: "9 min read", href: "#" },
-  { title: "3% is all you need", read: "5 min read", href: "#" },
+  {
+    tag: "Plain English",
+    title: "The geometry of forgetting",
+    subtitle: "Why AI memory forgets",
+    read: "6 min read",
+    href: "#",
+  },
+  {
+    tag: "Research result",
+    title: "The price of meaning",
+    subtitle: "Why meaning alone is not enough",
+    read: "8 min read",
+    href: "#",
+  },
+  {
+    tag: "Architecture",
+    title: "Semantic memory filesystem",
+    subtitle: "The engineering answer",
+    read: "10 min read",
+    href: "#",
+  },
+  {
+    tag: "Control",
+    title: "Operational reinforcement",
+    subtitle: "How Sentra catches drift",
+    read: "7 min read",
+    href: "#",
+  },
+  {
+    tag: "Alignment",
+    title: "Avoidance learning",
+    subtitle: "Alignment without reward hacking",
+    read: "9 min read",
+    href: "#",
+  },
+  {
+    tag: "Efficiency",
+    title: "3% is all you need",
+    subtitle: "Structure beats brute force",
+    read: "5 min read",
+    href: "#",
+  },
 ];
 
 function Arrow() {
@@ -181,7 +219,9 @@ export function ResearchView() {
         <div className="rp-grid">
           {papers.map((p) => (
             <a className="rp-card" href={p.href} key={p.title}>
+              <span className="rp-tag">{p.tag}</span>
               <h3 className="rp-title">{p.title}</h3>
+              <p className="rp-subtitle">{p.subtitle}</p>
               <div className="rp-foot">
                 <span className="rp-time">{p.read}</span>
                 <Arrow />
