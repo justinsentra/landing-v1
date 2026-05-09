@@ -15,7 +15,7 @@ export const FOOTER_LINKS = [
   },
   {
     heading: "Company",
-    items: ["About", "Manifesto", "Enterprise", "Pricing", "Blog", "Careers"],
+    items: ["Enterprise", "Blog"],
   },
   {
     heading: "Preferences",
@@ -26,4 +26,4 @@ export const FOOTER_LINKS = [
 export const FOOTER_SUBPROCESSORS =
   "Subprocessors include Amazon Web Services, GitHub, Slack, Google Cloud Platform, OpenAI, and Anthropic.";
 
-export const FOOTER_COPYRIGHT = "© 2026 Sentra Labs. All rights reserved.";
+export const FOOTER_COPYRIGHT = "© 2026 Dynamis Labs Inc. All rights reserved.";

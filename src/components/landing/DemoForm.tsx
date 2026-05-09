@@ -36,8 +36,7 @@ export function DemoForm() {
 
   if (submitted) {
     return (
-      <div className="demo-form-done" role="status">
-        <span className="demo-label">Filed</span>
+      <div className="demo-form demo-form-done" role="status">
         <h3>We have it.</h3>
         <p>
           Someone from the Sentra team will write back within one business day.
@@ -61,6 +60,7 @@ export function DemoForm() {
           name="email"
           type="email"
           autoComplete="email"
+          placeholder="you@company.com"
           required
         />
       </div>
@@ -134,13 +134,12 @@ export function DemoForm() {
           id="motivation"
           name="motivation"
           rows={4}
-          placeholder="A system that captures decisions across meetings and Slack, and makes them searchable for new hires."
+          placeholder="A system that captures decisions across meetings and Slack."
         />
       </div>
 
       <button type="submit" className="demo-submit">
-        <span>Book a demo</span>
-        <span aria-hidden="true">→</span>
+        Submit
       </button>
     </form>
   );

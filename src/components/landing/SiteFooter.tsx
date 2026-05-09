@@ -19,9 +19,9 @@ export function SiteFooter() {
           </div>
         ))}
       </div>
-      <p className="foot-subprocessors">{FOOTER_SUBPROCESSORS}</p>
       <div className="foot-bot">
         <span>{FOOTER_COPYRIGHT}</span>
+        <span className="foot-subprocessors">{FOOTER_SUBPROCESSORS}</span>
       </div>
     </>
   );

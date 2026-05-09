@@ -16,6 +16,7 @@ const smoothstep = (t: number) => t * t * (3 - 2 * t);
 const navLinks = [
   { href: "/research", label: "Research" },
   { href: "/manifesto", label: "Manifesto" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export default function Nav() {
