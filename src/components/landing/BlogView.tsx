@@ -16,7 +16,7 @@ type ThumbKind =
   | "forget";
 
 const featured: Post = {
-  title: "Company brain: why most companies have data but no memory",
+  title: "Company Brain: Why Most Companies Have Data But No Memory",
   date: "Apr 2026",
   href: "https://nanothoughts.substack.com/p/company-brain-why-most-companies",
   thumb: "memory",
@@ -24,44 +24,44 @@ const featured: Post = {
 
 const posts: Post[] = [
   {
-    title: "Company brain, part 2: factual memory",
+    title: "Company Brain, Part 2: Factual Memory",
     date: "Apr 2026",
     href: "https://nanothoughts.substack.com/p/company-brain-part-2-factual-memory",
     thumb: "factual",
   },
   {
-    title: "Company brain, part 3: interaction memory",
+    title: "Company Brain, Part 3: Interaction Memory",
     date: "May 2026",
     href: "https://nanothoughts.substack.com/p/company-brain-part-3-interaction",
     thumb: "interaction",
   },
   {
-    title: "Company brain, part 4: action memory",
+    title: "Company Brain, Part 4: Action Memory",
     date: "Apr 2026",
     href: "https://nanothoughts.substack.com/p/company-brain-part-4-action-memory",
     thumb: "action",
   },
   {
-    title: "Memory is state, not a service",
+    title: "Memory Is State, Not a Service",
     date: "Mar 2026",
     href: "https://nanothoughts.substack.com/p/memory-is-state-not-a-service",
     thumb: "state",
   },
   {
-    title: "Who signs? The Anthropic paradox and the $40 trillion choice",
+    title: "Who Signs? The Anthropic Paradox and the $40 Trillion Choice",
     date: "Apr 2026",
     href: "https://nanothoughts.substack.com/p/who-signs-the-anthropic-paradox-and",
     thumb: "signs",
   },
   {
     title:
-      "Enterprise general intelligence: the emergent mind of organizations",
+      "Enterprise General Intelligence: The Emergent Mind of Organizations",
     date: "Feb 2026",
     href: "https://nanothoughts.substack.com/p/enterprise-general-intelligence-the",
     thumb: "egi",
   },
   {
-    title: "Why AI needs to forget",
+    title: "Why AI Needs to Forget",
     date: "Jan 2026",
     href: "https://nanothoughts.substack.com/p/why-ai-needs-to-forget",
     thumb: "forget",
@@ -257,7 +257,7 @@ export function BlogView() {
       data-nav-theme="light"
     >
       <div className="container">
-        <h1 className="sec-h">Blog.</h1>
+        <h1 className="sec-h">Blog</h1>
 
         <a
           className="bp-feature"

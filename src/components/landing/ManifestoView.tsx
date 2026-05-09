@@ -73,7 +73,7 @@ export function ManifestoView() {
       data-nav-theme="light"
     >
       <div className="container">
-        <h1 className="sec-h">Manifesto.</h1>
+        <h1 className="sec-h">Manifesto</h1>
         <p className="sec-sub">
           Every organization runs on intelligence — the decisions made in
           meetings, the context buried in threads, the commitments forged in

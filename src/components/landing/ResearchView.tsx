@@ -9,37 +9,37 @@ const papers: Paper[] = [
   {
     tag: "Plain English",
     title: "The geometry of forgetting",
-    subtitle: "Why AI memory forgets.",
+    subtitle: "Why AI memory forgets",
     href: "#",
   },
   {
     tag: "Research result",
     title: "The price of meaning",
-    subtitle: "Why meaning alone is not enough.",
+    subtitle: "Why meaning alone is not enough",
     href: "#",
   },
   {
     tag: "Architecture",
     title: "Semantic memory filesystem",
-    subtitle: "The engineering answer.",
+    subtitle: "The engineering answer",
     href: "#",
   },
   {
     tag: "Control",
     title: "Operational reinforcement",
-    subtitle: "How Sentra catches drift.",
+    subtitle: "How Sentra catches drift",
     href: "#",
   },
   {
     tag: "Alignment",
     title: "Avoidance learning",
-    subtitle: "Alignment without reward hacking.",
+    subtitle: "Alignment without reward hacking",
     href: "#",
   },
   {
     tag: "Efficiency",
     title: "3% is all you need",
-    subtitle: "Structure beats brute force.",
+    subtitle: "Structure beats brute force",
     href: "#",
   },
 ];
@@ -53,9 +53,21 @@ export function ResearchView() {
       data-nav-theme="light"
     >
       <div className="container">
-        <h1 className="sec-h">Research.</h1>
-        <p className="sec-sub">
-          Foundations for enterprise memory, alignment, and intelligence.
+        <span className="rh-eyebrow">Research</span>
+        <h1 className="rh-display">
+          Building the mathematical and architectural foundations for enterprise
+          memory, alignment, and intelligence.
+        </h1>
+        <p className="rh-lede">
+          Most enterprise AI fails for a structural reason: it has no memory,
+          and it cannot learn from its own failures. Our research program proves
+          why memory systems break, derives what is possible, and converts
+          impossibility results into engineering specifications.
+        </p>
+        <p className="rh-lede">
+          The intelligence is not in the model. It is in the architecture. The
+          papers below outline how Sentra builds memory that is deterministic,
+          provable, and aligned by design.
         </p>
 
         <div className="rp-grid bleed-top bleed-bottom">
