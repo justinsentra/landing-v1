@@ -12,16 +12,15 @@ type Post = {
   href: string;
 };
 
-const featured: Post = {
-  title: "Company Brain: Why Most Companies Have Data But No Memory",
-  date: "Apr 2026",
-  category: "Brain",
-  excerpt:
-    "The first essay in the series. Why organizations have data but lose institutional context — and what a real company brain would replace.",
-  href: "https://nanothoughts.substack.com/p/company-brain-why-most-companies",
-};
-
-const posts: Post[] = [
+const allPosts: Post[] = [
+  {
+    title: "Company Brain: Why Most Companies Have Data But No Memory",
+    date: "Apr 2026",
+    category: "Brain",
+    excerpt:
+      "Why organizations have data but lose institutional context — and what a real company brain would replace.",
+    href: "https://nanothoughts.substack.com/p/company-brain-why-most-companies",
+  },
   {
     title: "Company Brain, Part 2: Factual Memory",
     date: "Apr 2026",
@@ -88,9 +87,7 @@ const AUTHOR = "Ashwin Gopinath";
 
 export function BlogView() {
   const [filter, setFilter] = useState<FilterKey>("All");
-
-  const visibleFeatured = filter === "All" || featured.category === filter;
-  const visiblePosts = posts.filter(
+  const visible = allPosts.filter(
     (p) => filter === "All" || p.category === filter,
   );
 
@@ -102,11 +99,8 @@ export function BlogView() {
       data-nav-theme="light"
     >
       <div className="container">
-        <h1 className="sec-h">Blog</h1>
-        <p className="sec-sub">
-          Notes on memory, organizations, and the architecture of enterprise
-          intelligence. Written by the Sentra team.
-        </p>
+        <span className="rh-eyebrow">Blog</span>
+        <h1 className="rh-display">News and updates from Sentra.</h1>
 
         <div className="bp-filters" role="tablist" aria-label="Filter posts">
           {filters.map((f) => (
@@ -123,34 +117,33 @@ export function BlogView() {
           ))}
         </div>
 
-        <div className="bp-list bleed-top">
-          {visibleFeatured && <Row post={featured} highlighted />}
-          {visiblePosts.map((p) => (
-            <Row key={p.title} post={p} />
+        <div className="bp-grid bleed-top bleed-bottom">
+          {visible.map((p) => (
+            <a
+              className="bp-card"
+              href={p.href}
+              key={p.title}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <header className="bp-card-head">
+                <span className="bp-card-author">{AUTHOR}</span>
+                <span className="bp-card-meta">
+                  {p.date} <span aria-hidden="true">/</span>{" "}
+                  <span className="bp-card-cat">{p.category}</span>
+                </span>
+              </header>
+              <div className="bp-card-body">
+                <h2 className="bp-card-title">{p.title}</h2>
+                <p className="bp-card-excerpt">{p.excerpt}</p>
+              </div>
+            </a>
           ))}
-          {!visibleFeatured && visiblePosts.length === 0 && (
+          {visible.length === 0 && (
             <p className="bp-empty">No posts in this category yet.</p>
           )}
         </div>
       </div>
     </section>
-  );
-}
-
-function Row({ post, highlighted }: { post: Post; highlighted?: boolean }) {
-  return (
-    <a
-      className={`bp-row${highlighted ? " is-feature" : ""}`}
-      href={post.href}
-      target="_blank"
-      rel="noreferrer"
-    >
-      <span className="bp-row-meta">
-        {post.date} · <span className="bp-row-cat">{post.category}</span>
-      </span>
-      <h2 className="bp-row-title">{post.title}</h2>
-      <p className="bp-row-excerpt">{post.excerpt}</p>
-      <span className="bp-row-author">{AUTHOR}</span>
-    </a>
   );
 }
