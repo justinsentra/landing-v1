@@ -45,9 +45,9 @@ export default function Agents() {
                   </span>
                 ))}
               </div>
-              <button type="button" className="btn btn-solid runs-cta">
+              <a href="/integrations" className="btn btn-solid runs-cta">
                 All integrations →
-              </button>
+              </a>
             </div>
           </div>
 

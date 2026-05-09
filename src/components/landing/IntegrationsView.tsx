@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { integrations } from "@/data/integrations";
+import { BrandIcon } from "./BrandIcon";
 
 const INITIAL = 36;
 const STEP = 36;
@@ -45,8 +46,7 @@ export function IntegrationsView() {
           <div className="int-head-title">
             <h1 className="sec-h">Browse the apps Sentra connects to.</h1>
             <p className="sec-sub">
-              {integrations.length}+ integrations and counting. Pull context
-              from every tool your team already uses.
+              200+ integrations and counting. Pull context from all your tools.
             </p>
           </div>
           <div className="int-head-controls">
@@ -70,7 +70,7 @@ export function IntegrationsView() {
               </span>
               <input
                 type="search"
-                placeholder={`Search ${integrations.length}+ connected apps`}
+                placeholder="Search 200+ connected apps"
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -104,7 +104,9 @@ export function IntegrationsView() {
             {visible.map((i) => (
               <article className="int-cell" key={i.name}>
                 <div className="int-cell-head">
-                  <span className="int-ic" aria-hidden="true" />
+                  <span className="int-ic" aria-hidden="true">
+                    <BrandIcon brandKey={i.key} name={i.name} size={28} />
+                  </span>
                   <span className="int-name">{i.name}</span>
                   <span className="int-cat">{i.category}</span>
                 </div>

@@ -11,9 +11,9 @@ export function DemoView() {
       <div className="container">
         <div className="demo-grid">
           <div className="demo-left">
-            <h1 className="sec-h">Talk to our sales team</h1>
+            <h1 className="sec-h">Talk to our Sales team</h1>
             <p className="sec-sub">
-              Connect with our sales team to explore how we can support your use
+              Connect with our Sales team to explore how we can support your use
               case.
             </p>
 
