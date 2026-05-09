@@ -15,7 +15,7 @@ const items: {
     id: "connect",
     num: "01",
     title: "Connect",
-    body: "Plug into 40+ tools in minutes. Sentra continuously syncs meetings, messages, docs, tickets, code, and CRM data — and automatically extracts entities, relationships, and decisions. No tagging. No filing. No prompts.",
+    body: "Plug into 200+ tools in minutes. Sentra continuously syncs meetings, messages, docs, tickets, code, and CRM data — and automatically extracts entities, relationships, and decisions. No tagging. No filing. No prompts.",
   },
   {
     id: "graph",
