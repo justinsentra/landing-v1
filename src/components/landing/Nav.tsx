@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { DEMO_HREF, DEMO_LABEL } from "@/data/site";
 import { SentraMark } from "./brand-icons";
 
@@ -19,8 +20,14 @@ const navLinks = [
   { href: "/blog", label: "Blog" },
 ];
 
+const LIGHT_ROUTES = ["/research", "/blog", "/manifesto"];
+
 export default function Nav() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
+  const initialMix = LIGHT_ROUTES.some((r) => pathname?.startsWith(r))
+    ? "1"
+    : "0";
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -78,10 +85,10 @@ export default function Nav() {
     <div
       className="nav-wrap"
       ref={wrapRef}
-      data-nav-theme="dark"
+      data-nav-theme={initialMix === "1" ? "light" : "dark"}
       style={
         {
-          ["--nav-mix" as string]: "0",
+          ["--nav-mix" as string]: initialMix,
           ["--nav-lift" as string]: "0",
         } as React.CSSProperties
       }

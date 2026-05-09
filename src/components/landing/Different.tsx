@@ -1,6 +1,10 @@
 import Image from "next/image";
 
-type Side = { who: string; body: string; img: { src: string; alt: string } };
+type Side = {
+  who: string;
+  body: string[];
+  img: { src: string; alt: string };
+};
 type Row = { lab: string; q: string; left: Side; right: Side };
 
 const rows: Row[] = [
@@ -9,7 +13,10 @@ const rows: Row[] = [
     q: "Query time vs. write time",
     left: {
       who: "Context graphs",
-      body: "A context graph is supposed to map relationships between people, decisions, and documents — but most do the work at query time. Every time you ask a question, the system has to crawl Slack, then email, then meetings, then docs, then guess how the pieces relate. The structure is rediscovered on every request, with stale results, missed connections, and slow latency.",
+      body: [
+        "Most context graphs do the work at query time. When you ask a question, the system has to crawl Slack, then email, then meetings, then docs, and guess how the pieces relate.",
+        "The structure is rediscovered on every request — stale results, missed connections, slow latency.",
+      ],
       img: {
         src: "/generated/diff-row1-fragments.png",
         alt: "Disconnected app icons floating across a dotted background, suggesting fragmented context",
@@ -17,7 +24,10 @@ const rows: Row[] = [
     },
     right: {
       who: "Sentra",
-      body: "Sentra builds the graph at ingest. As each interaction lands, we resolve identities, extract entities, link evidence, and write typed nodes and edges into a bi-temporal graph — once, ahead of time. By the time anyone (or any agent) asks a question, the structure already exists. Queries become reads, not reconstructions.",
+      body: [
+        "Sentra builds the graph at ingest. As each interaction lands, we resolve identities, extract entities, and write typed nodes and edges — once, ahead of time.",
+        "By the time you (or any agent) ask a question, the structure already exists. Queries become reads, not reconstructions.",
+      ],
       img: {
         src: "/generated/diff-row1-graph.png",
         alt: "A polished node-edge graph diagram with a central cobalt node and satellite nodes",
@@ -29,7 +39,10 @@ const rows: Row[] = [
     q: "Artifacts vs. interactions",
     left: {
       who: "Connectors",
-      body: "Connectors are pipelines that pull artifacts out of SaaS tools — the CRM record, the Jira ticket, the Confluence page. They give you the output of decisions, but never the decisions themselves. The meeting where the deal was renegotiated, the thread where engineering pushed back, the call where the customer escalated — all of that disappears the moment someone writes the ticket.",
+      body: [
+        "Connectors pull artifacts out of SaaS tools — the CRM record, the Jira ticket, the Confluence page. They give you the output of a decision, but never the decision itself.",
+        "The meeting where the deal was renegotiated, the thread where engineering pushed back, the call where the customer escalated — all of it disappears the moment someone writes the ticket.",
+      ],
       img: {
         src: "/generated/diff-row2-artifacts.png",
         alt: "Three overlapping document records — HubSpot, Google Doc, Linear — without surrounding rationale",
@@ -37,7 +50,10 @@ const rows: Row[] = [
     },
     right: {
       who: "Sentra",
-      body: "Sentra captures interactions as first-class evidence — meetings, Slack threads, emails, calls, agent traces — and links them to the artifacts they produced. The CRM entry doesn't just say what changed; it carries the conversation that caused the change, the people who shaped it, and the rationale behind it. The why travels with the what.",
+      body: [
+        "Sentra captures interactions as first-class evidence — meetings, Slack threads, emails, calls, agent traces — and links each one to the artifact it produced.",
+        "The CRM entry doesn't just say what changed. It carries the conversation that caused the change. The why travels with the what.",
+      ],
       img: {
         src: "/generated/diff-row2-interactions.png",
         alt: "Zoom, Slack, and Gmail evidence cards with cobalt edges converging into a single decision node",
@@ -45,11 +61,14 @@ const rows: Row[] = [
     },
   },
   {
-    lab: "How identity resolves",
-    q: "Sarah, S. Chen, @schen",
+    lab: "How people are matched",
+    q: "Fragmented identity vs. resolved actor",
     left: {
-      who: "LLMs with context windows",
-      body: 'Most systems treat each tool independently. "Sarah Chen" in HubSpot, "S. Chen" in Gmail, and "@schen" in Slack read as three different people with three histories. The model never realizes the same person is escalating in support, negotiating in the deal room, and quiet-quitting in the channel — so it never connects the dots that matter.',
+      who: "Keyword search & LLMs",
+      body: [
+        'Most systems treat each tool independently. "Sarah Chen" in HubSpot, "S. Chen" in Gmail, and "@schen" in Slack read as three different people with three different histories.',
+        "The model never realizes the same person is escalating in support, negotiating in the deal room, and going quiet in the channel — so it never connects the dots that matter.",
+      ],
       img: {
         src: "/generated/diff-row3-identity-split.png",
         alt: "Three identity cards for the same person across Slack, Gmail, HubSpot — fragmented histories",
@@ -57,7 +76,10 @@ const rows: Row[] = [
     },
     right: {
       who: "Sentra",
-      body: "Sentra runs continuous, confidence-scored identity resolution across every surface — names, emails, handles, phone numbers, internal IDs — and merges them into a single canonical actor with one timeline. When the deal lead pings support, the sales context comes with them. One person, one history, one thread of accountability across the whole company.",
+      body: [
+        "Sentra runs continuous, confidence-scored identity resolution across every surface — names, emails, handles, phone numbers, internal IDs — and merges them into one canonical actor.",
+        "When the deal lead pings support, their sales context comes with them. One person, one history, one thread of accountability across the whole company.",
+      ],
       img: {
         src: "/generated/diff-row3-identity-resolved.png",
         alt: "Four surface markers converging via cobalt edges into one resolved canonical identity",
@@ -69,17 +91,23 @@ const rows: Row[] = [
     q: "Snapshot vs. bi-temporal",
     left: {
       who: "Vector stores & RAG",
-      body: "A vector database is a haystack of embeddings. Old facts sit next to new ones with no concept of when they were true. A renewal date from last quarter, a product spec that was reversed, a customer commitment that was withdrawn — all retrievable, all equally weighted, all able to mislead the model into confidently restating yesterday's reality as today's truth.",
+      body: [
+        "A vector database is a haystack of embeddings. Old facts sit next to new ones with no concept of when each was true.",
+        "Last quarter's renewal date, a reversed product spec, a withdrawn commitment — all retrievable, all equally weighted, all able to confidently restate yesterday's reality as today's truth.",
+      ],
       img: {
-        src: "/generated/diff-row4-snapshot.png",
+        src: "/generated/diff-row1-fragments.png",
         alt: "A flat haystack of undifferentiated vector points with no temporal axis",
       },
     },
     right: {
       who: "Sentra",
-      body: "Every fact in the Sentra graph carries two timestamps: when it became true and when it stopped being true. Old facts are invalidated, not deleted — every claim has a lifespan and a source. The model can reason about what was true on a given date, why it changed, and which decision overrode it. Provenance and time are first-class, not metadata.",
+      body: [
+        "Every fact in Sentra carries two timestamps: when it became true, and when it stopped being true. Old facts are invalidated, not deleted.",
+        "The graph can reason about what was true on a given date, why it changed, and which decision overrode it. Provenance and time are first-class, not metadata.",
+      ],
       img: {
-        src: "/generated/diff-row4-bitemporal.png",
+        src: "/generated/diff-row1-graph.png",
         alt: "Layered timeline with valid and stop-valid bands per fact, anchored to evidence nodes",
       },
     },
@@ -107,7 +135,9 @@ function Cell({ side, isYou }: { side: Side; isYou?: boolean }) {
         )}
       </span>
       <div className="diff-cell-text">
-        <p>{side.body}</p>
+        {side.body.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
       </div>
       <div className="diff-vis">
         <Image

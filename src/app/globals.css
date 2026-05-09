@@ -888,7 +888,7 @@ button {
 .diff-cell-text {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 .diff-vis {
   margin-top: auto;
@@ -1861,6 +1861,14 @@ section#apps {
   padding: 168px 0 56px;
   display: flex;
   flex-direction: column;
+}
+.pf-inner {
+  padding: 96px 0 56px;
+}
+@media (max-width: 760px) {
+  .pf-inner {
+    padding: 64px 0 40px;
+  }
 }
 .final-hero {
   text-align: center;
