@@ -54,14 +54,6 @@ const sections: Section[] = [
       "Phase 3 — Org-wide RL. Sentra becomes irreplaceable infrastructure. The system doesn’t just remember — it improves.",
     ],
   },
-  {
-    id: "collapse",
-    label: "07",
-    title: "We do not engineer automation. We make it inevitable.",
-    body: [
-      "When an intelligence layer captures every commitment, tracks every dependency, and understands every person’s context, workflows collapse on their own. The action layer is a natural consequence of the intelligence layer.",
-    ],
-  },
 ];
 
 export function ManifestoView() {
@@ -74,26 +66,17 @@ export function ManifestoView() {
     >
       <div className="container">
         <h1 className="sec-h">Manifesto</h1>
-        <p className="sec-sub">
-          Every organization runs on intelligence — the decisions made in
-          meetings, the context buried in threads, the commitments forged in
-          conversation. Sentra captures these at their source and turns every
-          company into a system that learns, remembers, and acts on what it
-          knows.
-        </p>
 
-        <div className="mb-stack bleed-top">
+        <div className="mb-grid">
           {sections.map((s) => (
-            <article className="mb-section" key={s.id} id={s.id}>
+            <article className="mb-cell" key={s.id} id={s.id}>
               <span className="mb-num">{s.label}</span>
-              <div className="mb-body">
-                <h2 className="mb-h">{s.title}</h2>
-                {s.body.map((p, i) => (
-                  <p className="mb-p" key={i}>
-                    {p}
-                  </p>
-                ))}
-              </div>
+              <h2 className="mb-h">{s.title}</h2>
+              {s.body.map((p, i) => (
+                <p className="mb-p" key={i}>
+                  {p}
+                </p>
+              ))}
             </article>
           ))}
         </div>

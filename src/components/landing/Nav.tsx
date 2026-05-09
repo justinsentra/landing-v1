@@ -91,6 +91,7 @@ export default function Nav() {
         <div className="nav-left">
           <a href="/" aria-label="Sentra home" className="nav-brand">
             <SentraMark className="brand-mark" />
+            <span className="wordmark">Sentra</span>
           </a>
         </div>
         <div className="nav-mid">
