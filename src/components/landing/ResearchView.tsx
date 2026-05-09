@@ -180,7 +180,7 @@ export function ResearchView() {
           </p>
         </div>
 
-        <div className="ra-stack">
+        <div className="ra-stack bleed-top bleed-bottom">
           {acts.map((a) => (
             <article
               className="ra-act"

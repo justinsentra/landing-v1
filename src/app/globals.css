@@ -2766,7 +2766,7 @@ section#apps {
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0;
-  color: var(--mono-ink);
+  color: var(--primary);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
