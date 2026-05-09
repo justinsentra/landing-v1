@@ -14,9 +14,8 @@ const LIFT_SCROLL = 80;
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
 const navLinks = [
-  { href: "#research", label: "Research" },
-  { href: "#blog", label: "Blog" },
-  { href: "#manifesto", label: "Manifesto" },
+  { href: "/research", label: "Research" },
+  { href: "/manifesto", label: "Manifesto" },
 ];
 
 export default function Nav() {
@@ -89,7 +88,7 @@ export default function Nav() {
       <div className="nav-blur" aria-hidden="true" />
       <nav className="nav" data-screen-label="Nav">
         <div className="nav-left">
-          <a href="#" aria-label="Sentra home" className="nav-brand">
+          <a href="/" aria-label="Sentra home" className="nav-brand">
             <SentraMark className="brand-mark" />
           </a>
         </div>

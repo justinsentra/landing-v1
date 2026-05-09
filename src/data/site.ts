@@ -1,26 +1,29 @@
 export const TAGLINE = "Infrastructure for Organizational Memory";
 export const FOOTER_BLURB =
   "Infrastructure for organizational memory. Filed in the moment it happens.";
-export const DEMO_HREF = "#demo";
+export const DEMO_HREF = "/demo";
 export const DEMO_LABEL = "Book a demo";
 
 export const FOOTER_LINKS = [
   {
-    heading: "Product",
-    items: ["Substrate", "Pipeline", "Connectors", "Pricing"],
+    heading: "Legal",
+    items: ["Terms of Service", "Privacy Policy"],
   },
   {
-    heading: "Resources",
-    items: ["Documentation", "Research manifesto", "Brand system", "Blog"],
+    heading: "Compliance",
+    items: ["How We Handle Data"],
   },
   {
     heading: "Company",
-    items: ["About", "Careers", "Security", "Contact"],
+    items: ["About", "Manifesto", "Enterprise", "Pricing", "Blog", "Careers"],
+  },
+  {
+    heading: "Preferences",
+    items: ["Cookie Settings", "Do Not Sell or Share My Personal Information"],
   },
 ] as const;
 
-export const FOOTER_META = [
-  "Sentra · 2026 · v1.0",
-  "Structure beats scale",
-  "SR-2026-05-001",
-] as const;
+export const FOOTER_SUBPROCESSORS =
+  "Subprocessors include Amazon Web Services, GitHub, Slack, Google Cloud Platform, OpenAI, and Anthropic.";
+
+export const FOOTER_COPYRIGHT = "© 2026 Sentra Labs. All rights reserved.";

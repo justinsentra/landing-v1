@@ -30,7 +30,7 @@ export default function Agents() {
       <div className="container">
         <div className="agents-grid">
           <div>
-            <h2>Your agents deserve the same memory your team has.</h2>
+            <h2>Your agents deserve the same memory.</h2>
             <p>
               The Sentra context graph is exposed as a REST API and MCP server —
               so your agents read from the same memory as your team.

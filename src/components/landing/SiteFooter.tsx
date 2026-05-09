@@ -1,20 +1,13 @@
-import { FOOTER_BLURB, FOOTER_LINKS, FOOTER_META } from "@/data/site";
+import {
+  FOOTER_COPYRIGHT,
+  FOOTER_LINKS,
+  FOOTER_SUBPROCESSORS,
+} from "@/data/site";
 
 export function SiteFooter() {
   return (
     <>
       <div className="foot-grid">
-        <div className="foot-brand">
-          <a href="#" className="lockup" aria-label="Sentra">
-            <span className="mark">
-              <span />
-              <span />
-              <span />
-            </span>
-            <span className="wm">Sentra</span>
-          </a>
-          <p>{FOOTER_BLURB}</p>
-        </div>
         {FOOTER_LINKS.map((col) => (
           <div key={col.heading}>
             <h5>{col.heading}</h5>
@@ -26,10 +19,9 @@ export function SiteFooter() {
           </div>
         ))}
       </div>
+      <p className="foot-subprocessors">{FOOTER_SUBPROCESSORS}</p>
       <div className="foot-bot">
-        {FOOTER_META.map((line) => (
-          <span key={line}>{line}</span>
-        ))}
+        <span>{FOOTER_COPYRIGHT}</span>
       </div>
     </>
   );
