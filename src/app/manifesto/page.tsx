@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import Nav from "@/components/landing/Nav";
+import LandingShell from "@/components/landing/LandingShell";
 import { ManifestoView } from "@/components/landing/ManifestoView";
-import FinalCTA from "@/components/landing/FinalCTA";
 import { createMetadata } from "@/utils/metadata";
 
 export const metadata: Metadata = createMetadata({ canonical: "/manifesto" });
 
 export default function ManifestoPage() {
   return (
-    <>
-      <Nav />
+    <LandingShell>
       <ManifestoView />
-      <FinalCTA />
-    </>
+    </LandingShell>
   );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DEMO_HREF, DEMO_LABEL } from "@/data/site";
 import { DarkBackdrop } from "./DarkBackdrop";
 import { SiteFooter } from "./SiteFooter";
@@ -20,9 +21,9 @@ export default function FinalCTA() {
             product demo.
           </p>
           <div className="ctas">
-            <a className="btn btn-solid" href={DEMO_HREF}>
+            <Link className="btn btn-solid" href={DEMO_HREF}>
               {DEMO_LABEL}
-            </a>
+            </Link>
           </div>
         </div>
 

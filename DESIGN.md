@@ -10,37 +10,65 @@ This document is the canonical visual reference. The build hews to it. When this
 
 Sentra is identifiable by exactly four things. Lose any one, and it stops being Sentra.
 
-1. **Dashed hairlines as the universal structural element** — never solid rules.
+1. **Dashed hairlines as the universal structural element** — never solid rules on layout boundaries. (Form inputs and search controls are conventionally solid; that's not a layout boundary.)
 2. **A three-band monogram** — ink / cobalt / ink — the middle band is the brand's only color.
 3. **ASCII as the diagrammatic register** — no icon set, no illustration, no isometric anything.
-4. **Cobalt at 5% of surface** over cool paper — `#1E5EFF` is a margin highlight, not a banner.
+4. **Cobalt at 5% of surface** over cool paper — `#2F6BD1` is a margin highlight, not a banner.
 
 ---
 
-## 1. Color · eight values, no exceptions
+## 1. Color tokens
 
-| Token                | Hex       | Role                                  |
-| -------------------- | --------- | ------------------------------------- |
-| `--bg`               | `#F4F5F7` | Canvas. Cool steel paper, near-white. |
-| `--surface`          | `#FAFBFC` | Cards, ASCII blocks.                  |
-| `--fg`               | `#0E0E12` | Primary type, dark surfaces.          |
-| `--primary`          | `#1E5EFF` | Cobalt. The single accent.            |
-| `--primary-deep`     | `#0B3FBF` | Pressed states, captions.             |
-| `--hairline-subtle`  | `#E4E6EA` | Secondary dividers.                   |
-| `--hairline-default` | `#D4D4D8` | Structural dividers (workhorse).      |
-| `--hairline-strong`  | `#A1A1AA` | Highest level of structure only.      |
-| `--muted`            | `#71717A` | Tertiary text.                        |
-| `--mono-ink`         | `#525252` | Metadata labels.                      |
+The system has three groups: **light surfaces**, **dark surfaces**, and **glass**. Use tokens; never raw hex.
 
-**Three observations the system depends on:**
+### Light surfaces (canvas, cards, type)
+
+| Token                | Hex                     | Role                                  |
+| -------------------- | ----------------------- | ------------------------------------- |
+| `--bg`               | `#F4F5F7`               | Canvas. Cool steel paper, near-white. |
+| `--surface`          | `#FAFBFC`               | Cards, ASCII blocks, hover ground.    |
+| `--fg`               | `#0E0E12`               | Primary type, dark surfaces.          |
+| `--primary`          | `#2F6BD1`               | Cobalt. The single accent.            |
+| `--primary-deep`     | `#1A4AA3`               | Pressed states, captions.             |
+| `--primary-wash`     | `rgba(47,107,209,0.04)` | Quote/callout ground.                 |
+| `--primary-tint`     | `rgba(47,107,209,0.07)` | Open-state row ground.                |
+| `--primary-edge`     | `rgba(47,107,209,0.22)` | Cobalt hairline accents.              |
+| `--hairline-subtle`  | `rgba(14,14,18,0.12)`   | Secondary dividers.                   |
+| `--hairline-default` | `rgba(14,14,18,0.22)`   | Structural dividers (workhorse).      |
+| `--hairline-strong`  | `rgba(14,14,18,0.42)`   | Highest level of structure only.      |
+| `--muted`            | `#71717A`               | Tertiary text.                        |
+| `--mono-ink`         | `#525252`               | Metadata labels (raw, not tokenized). |
+
+### Dark surfaces (hero, agents, final CTA, footer)
+
+| Token            | Value                    | Role                        |
+| ---------------- | ------------------------ | --------------------------- |
+| `--hero-ink`     | `#06070A`                | Pure ink ground for hero.   |
+| `--ink-d-strong` | `rgba(239,241,244,0.92)` | Headlines on dark.          |
+| `--ink-d-body`   | `rgba(239,241,244,0.78)` | Body copy on dark.          |
+| `--ink-d-muted`  | `rgba(239,241,244,0.55)` | Tertiary copy on dark.      |
+| `--ink-d-faint`  | `rgba(239,241,244,0.45)` | Footer headers, meta.       |
+| `--ink-d-edge`   | `rgba(239,241,244,0.22)` | Hairlines on dark surfaces. |
+| `--ink-d-hush`   | `rgba(239,241,244,0.16)` | Faintest hairlines on dark. |
+
+### Glass scale (page-meta strip, nav-cta on dark)
+
+| Token        | Value                    | Use                   |
+| ------------ | ------------------------ | --------------------- |
+| `--glass-xs` | `rgba(255,255,255,0.08)` | Faint glass fill.     |
+| `--glass-sm` | `rgba(255,255,255,0.16)` | Hover ground on dark. |
+| `--glass-md` | `rgba(255,255,255,0.26)` | Glass CTA fill.       |
+| `--glass-lg` | `rgba(255,255,255,0.34)` | Glass CTA hover.      |
+
+### Three observations the system depends on
 
 1. The background is **steel, not white, not paper**. `#F4F5F7` is a cool, near-white grey with no warmth. Never substitute `#FFFFFF`. Never warm it.
 2. The foreground is **near-black with a blue cast** (`#0E0E12`). Pure black would feel printed; this reads as ink on a screen.
-3. **Cobalt is the only accent.** Used surgically. The discipline is **5% of surface**.
+3. **Cobalt is the only accent.** `#2F6BD1` is a tuned, slightly desaturated cobalt — louder than navy, quieter than electric. The discipline is **5% of surface**.
 
 **Surface ratio (memorize):** `BG 60% / FG 25% / hairlines 8% / primary 5% / muted 2%`.
 
-**Forbidden:** gradients (except hero chrome), tints, semantic colors (success/warning/error). Drift uses `⚠`, never red.
+**Forbidden:** gradients (except hero chrome and the cobalt-tinted `.pipe-item.is-open` ground), tints outside the cobalt-wash family, semantic colors for state (success/warning/error). Drift uses `⚠`, never red. The single sanctioned exception is the macOS-style traffic-light dots in code-bar mocks (`#ff5f56 #ffbd2e #27c93f`) — these are diegetic chrome inside a depicted code editor, not site state.
 
 ---
 
@@ -49,14 +77,19 @@ Sentra is identifiable by exactly four things. Lose any one, and it stops being 
 Two families do all the work. Sans is what the brand says about itself; mono is what the brand **is** — the framing, the file paths, the section numbers.
 
 ```
-display-xl   80 / 500 / 1.04 / -0.02em   Geist Sans
-display-l    56 / 500 / 1.06 / -0.02em   Geist Sans
-display-m    40 / 500 / 1.10 / -0.02em   Geist Sans
-body-l       18 / 400 / 1.60 / -0.01em   Geist Sans
-body-m       16 / 400 / 1.60 / -0.01em   Geist Sans
-mono-label   12 / 500 / 1.50 /  0.08em   Geist Mono UPPER
-mono-meta    11 / 400 / 1.50 /  0.06em   Geist Mono UPPER
+display-2xl  80 / 500 / 1.00 / -0.034em  Geist Sans   final-CTA hero
+display-xl   56 / 500 / 1.06 / -0.028em  Geist Sans   section heads, agents, research
+display-l    40 / 500 / 1.10 / -0.026em  Geist Sans   sub-display, rt-h, rp-h
+display-m    32 / 500 / 1.18 / -0.022em  Geist Sans   ra-act-title, mb-h
+display-s    24 / 500 / 1.22 / -0.018em  Geist Sans   fn-question, mb-thesis, mb-coda, demo-quote
+body-l       18 / 400 / 1.60 / -0.01em   Geist Sans   ledes, sec-sub, agents p
+body-m       16 / 400 / 1.60 / -0.005em  Geist Sans   primary body, demo input
+body-s       14 / 400 / 1.55 / -0.005em  Geist Sans   nav links, foot links, card excerpts
+mono-label   12 / 500 / 1.50 /  0          Geist Mono   labels, meta, eyebrows, sec-head, code-bar
+mono-meta    11 / 400 / 1.50 /  0          Geist Mono   smallest mono — counters, foot headers, fn-card-head
 ```
+
+**That's the entire scale.** No 13px, no 15px, no 17px, no 22px, no 30px, no 60px. If a value isn't on this list, it's drift. Aggressive snap was applied 2026-05-09; the system is closed.
 
 ### Rules
 
@@ -77,21 +110,49 @@ Geist via `next/font/google`. Subset `latin`. Variable: `--font-sans`. Preload w
 
 ## 3. Spacing & grid
 
-**Scale (8-based):** `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96 · 128`
+**Scale (strict 8-based):** `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96 · 128`
 
-**Grid:** 12 columns, **24px gutters**, **1280px max width**.
+No 6, 10, 14, 18, 20, 22, 36 — those were snapped out 2026-05-09. If you need a value between 16 and 24, choose one or the other; don't invent 18 or 20. The discipline of the scale is what makes the rhythm legible.
 
-**Section padding:** 96px vertical between major sections; 64px between sub-sections; 48px for ASCII blocks.
+**Grid:** 12 columns, **32px gutters**, **1200px max width** via `--container` and `--gutter`. Use `.container` on every section root; never set widths inline.
 
-The grid is **drawn explicitly** in the structure section — the brand wants you to know the grid exists.
+### Section rhythm — canonical tokens
+
+Every vertical padding on a section root must use one of these. No raw px.
+
+| Token                    | Value | Use                                                              |
+| ------------------------ | ----- | ---------------------------------------------------------------- |
+| `--section-major`        | 96px  | Major content sections (`.section`, `.fn-section`, agents grid). |
+| `--section-sub`          | 64px  | Sub-sections, transitions, margin between block + heading.       |
+| `--section-inline`       | 48px  | Inline boxes, ASCII blocks, axiom strips, mb-cell.               |
+| `--section-top`          | 192px | Subpage first section under fixed nav.                           |
+| `--section-top-sm`       | 128px | Subpage page top on narrow viewports (≤ 760px).                  |
+| `--section-top-final`    | 128px | Final-CTA hero top padding.                                      |
+| `--section-top-final-sm` | 96px  | Final-CTA hero top on narrow viewports.                          |
+
+Box internal padding: `--box-pad: 32px`. Card-internal padding: `--box-pad` plus 4px–8px optical adjustment per side as needed.
+
+### The compound-padding rule (load-bearing)
+
+> **A section owns only its top padding. The bottom edge belongs to the next section's top — never compound.**
+
+Concretely, every section-level CSS rule uses `padding: var(--section-X) 0 0` — top only, not `var(--section-X) 0` (which produces both top and bottom). This includes `.section`, `.fn-section`, `.agents-grid`, and any other element acting as a "section root."
+
+**Why it matters:** Editorial layout requires a heading-block sandwiched between two content slabs to be optically centered. If section padding is symmetric (96 top, 96 bottom), the gap above a heading compounds to 192px (96 from prev section + 96 from this section) while the gap below the heading is only 96px (the grid's `margin-top`). That's geometrically off-center by 96 pixels — the bug Justin spotted on the Different section.
+
+With top-only section padding, both gaps are 96. Headings sit in the optical middle of their breathing room, the way Swiss/editorial layout demands.
+
+**Internal block paddings** (e.g., `.int-empty { padding: var(--section-sub) 0 }`, `.mb-thesis { padding: 64px 0 }`) keep symmetric padding because they're discrete blocks with their own framing — they're not section roots, so the compound-padding rule doesn't apply.
 
 ### Breakpoints
 
-| Range        | Behavior                                                                                                                                                                                         |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `≥ 1280px`   | Full 12-col grid as designed.                                                                                                                                                                    |
-| `768–1279px` | Gutters 16px. `display-xl → clamp(48px, 7vw, 72px)`. ChiefOfStaff goes 2×2.                                                                                                                      |
-| `< 768px`    | Single column. Triads stack with horizontal dashed dividers. Hero wireframe inset shrinks to 16px. Nav collapses to lockup + mono-label "MENU" toggle (no hamburger icon — brand refuses icons). |
+| Range       | Behavior                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `≥ 900px`   | Full 12-col grid as designed. Container 1200px max.                                                                                                           |
+| `760–900px` | Agents grid stacks. ChiefOfStaff goes 2×2. Some sections drop to single-column.                                                                               |
+| `≤ 760px`   | Single column. Triads stack with horizontal dashed dividers. Page-top padding `--section-top-sm` (96px). Nav-mid hidden; nav collapses to lockup + CTAs only. |
+| `≤ 720px`   | `--gutter` reduces to 20px.                                                                                                                                   |
+| `≤ 600px`   | Form rows go single-column. Security grid goes single-column.                                                                                                 |
 
 ---
 
@@ -183,56 +244,110 @@ Files in `public/` (copied from `~/Downloads/landing page design/assets/`):
 
 ## 10. Buttons
 
-Two variants. No others.
+Three variants. No others. Each is bound to a specific surface context.
 
-### Primary
+### Primary — on light surfaces
 
 ```
+class:       .demo-submit (and any .btn-primary on light bg)
 background:  var(--primary)
-color:       var(--bg)
-padding:     12px 20px
+color:       #fff
+padding:     0 (height 52px)  •  full-width form CTA
 weight:      500
+size:        15px
 hover:       background → var(--primary-deep)
-press:       border: 2px solid var(--primary-deep); padding: 10px 18px
 focus:       2px solid var(--primary), 2px offset
-disabled:    color → muted, transparent bg
 ```
 
-### Ghost
+Used on the demo form, contact form. The single cobalt-fill CTA on the site.
+
+### Glass — on dark surfaces (hero, final CTA)
 
 ```
+class:       .btn.btn-solid
+background:  var(--glass-md)  →  var(--glass-lg) on hover
+color:       var(--ink-d-strong)
+border:      1px solid rgba(255,255,255,0.16)
+backdrop:    blur(8px)
+padding:     12px 22px (height 44px)
+weight:      500
+```
+
+The visual of "ink suspended in glass." Only on the hero and final-CTA dark grounds. Never on light pages.
+
+### Ghost / nav-pill — secondary, on any surface
+
+```
+class:       .nav-cta, secondary CTAs
 background:  transparent
-color:       var(--fg)
-border:      1px dashed var(--hairline-strong)
-padding:     11px 19px
-hover:       border-style: solid
-press:       border-width: 2px
+color:       inherits surface ink
+border:      1px solid currentColor at 0.22 opacity (color-mixed for current surface)
+padding:     8px 14px (height 38px)
+hover:       border-style: solid; background → glass-sm or surface
 ```
 
-**No scale-on-press.** The brand expresses press by compressing into ink (border thickening), not by scaling. This is one place where `make-interfaces-feel-better`'s `scale(0.96)` rule is intentionally **not** applied — it would feel toy-like against the documentary register.
+Smaller hit target than primary because it lives in dense nav strips. Hit area extended via `::after` pseudo-element to ≥ 40×40px.
 
-**Hit area** ≥ 40×40px on every interactive element. Extend with `::after` pseudo-element if visible target is smaller.
+### Cross-cutting button rules
+
+- **No scale-on-press.** Press = border thickening to 2px. Sentra refuses `scale(0.96)` from `make-interfaces-feel-better` — it would feel toy-like against the documentary register.
+- **Hit area** ≥ 40×40px on every interactive element. Extend with `::after` if the visible target is smaller.
+- **Focus:** 2px solid `var(--primary)` outline at 2px offset. Always visible. Never removed.
+- **Tabular numerals** on any button label that includes numbers.
+- **No `transition: all`.** Specify exact properties (`background`, `color`, `border-color`, `border-width`).
 
 ---
 
-## 11. Components (in `src/components/sentra/`)
+## 11. Components (`src/components/landing/`)
 
-Ported from `~/Downloads/landing page design/ui_kits/sentra-site/`.
+Single flat namespace under `landing/`. PascalCase filenames.
 
-| Component      | Responsibility                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------- |
-| `Monogram`     | Three-band stagger entry, 80ms each. Props: `size`, `animate`, `color`.                           |
-| `Wordmark`     | Cap-height bar + "Sentra" weight 600. Props: `size`, `color`.                                     |
-| `PageMeta`     | Fixed top strip. Live UTC clock with em-dashes. `mix-blend-mode: difference`.                     |
-| `Nav`          | Lockup left, links mid, ghost + primary CTA right. Active link = 1px solid cobalt underline.      |
-| `HeroChrome`   | Procedural liquid-chrome canvas. dpr capped at 2, paused off-screen, frozen under reduced-motion. |
-| `Hero`         | Composes HeroChrome + halftone overlay + dashed wireframe inset frame.                            |
-| `AxiomStrip`   | 3-col: label / axiom display / count. Bordered top+bottom by `hair-strong`.                       |
-| `AsciiBlock`   | IntersectionObserver typewriter. Renders as `<pre>`. Honors reduced-motion.                       |
-| `ContextGraph` | Phased SVG: idle → nodes (80ms stagger) → edges (120ms stagger) → cobalt-edge pulse 4s.           |
-| `FeatureTriad` | 3-col, dashed verticals. Mono labels in cobalt.                                                   |
-| `Footer`       | Inverted ink, three columns, dashed verticals, cobalt slogan.                                     |
-| `Button`       | `primary` / `ghost`, ref-forwarded.                                                               |
+| Component                                               | "use client" | Responsibility                                                                                                                                                                                           |
+| ------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Nav`                                                   | yes          | Wordmark left, Research/Manifesto/Blog mid, Demo CTA right. Drives `--nav-mix` from scroll for color transition (see §11.1).                                                                             |
+| `Hero`                                                  | no           | Headline, lede, single Glass CTA, Backed-by row. Above-fold images use `priority`.                                                                                                                       |
+| `DarkBackdrop`                                          | no           | Variant-driven dark ground (`hero` / `final` / `agents`). No canvas — solid `--hero-ink` plus optional halftone.                                                                                         |
+| `ChiefOfStaff`                                          | no           | 4-card grid (unified memory / meeting intel / risk / action). Each card has an Image + caption.                                                                                                          |
+| `Pipeline`                                              | yes          | Connect / Graph / Recall accordion. `useState` controls open layer; CSS handles visuals.                                                                                                                 |
+| `Different`                                             | no           | "What makes Sentra different?" + 3 rows of side-by-side comparison cells with images.                                                                                                                    |
+| `Agents`                                                | no           | Dark-section partner logos + code window. AI partner Marks (Claude/ChatGPT/etc) inline as components.                                                                                                    |
+| `Apps`                                                  | no           | Tools grid + "View all integrations" Link.                                                                                                                                                               |
+| `Functions`                                             | yes          | Horizontal-scroll card rail. `useEffect` for scroll-snap measurement and rail observation.                                                                                                               |
+| `Security`                                              | no           | 4-column compliance grid with dashed verticals.                                                                                                                                                          |
+| `FinalCTA`                                              | no           | Dark hero with CTA + composed `SiteFooter`. Used at the bottom of every route.                                                                                                                           |
+| `SiteFooter`                                            | no           | 4-column dark footer. Internal links use `<Link>`; `#` placeholders use `<a>`.                                                                                                                           |
+| `LegalView`                                             | no           | Shared shell for `/terms`, `/privacy`, `/data-privacy`. Renders title + lede + "Last updated" + cell-stack of clauses.                                                                                   |
+| `IntegrationsView`                                      | no           | Server component. Pre-renders ~210 cards with `BrandIcon` SVGs inlined.                                                                                                                                  |
+| `IntegrationsFilter`                                    | yes          | Client shell. Receives cards via `children`. Filters by name/category/hint reading data-\* props. Search + select + view-more.                                                                           |
+| `BlogView`, `DemoView`, `ResearchView`, `ManifestoView` | mixed        | Per-route page bodies. `DemoView` mounts `DemoForm` (`use client`). Others are pure server.                                                                                                              |
+| `DemoForm`                                              | yes          | Form state + submission. Standard React form pattern.                                                                                                                                                    |
+| `BrandIcon`                                             | no           | Reads `brand-paths.ts` (server-only at the call site) and renders inline SVG via `dangerouslySetInnerHTML`. Three kinds: `logo` (full color), `mono` (`.brand-mono` ink), `tile` (letter tile fallback). |
+| `brand-icons.tsx`                                       | no           | Hand-coded SVG components for non-brand marks (`SentraMark`, `ClaudeMark`, `ChatGPTMark`, `CursorMark`, `LangGraphMark`).                                                                                |
+
+### 11.1 Nav text color transition (`--nav-mix`)
+
+`Nav.tsx` writes `--nav-mix` and `--nav-lift` to its wrapper element. CSS rules on `.wordmark` and `.nav-link` resolve color via:
+
+```css
+color: color-mix(in oklab, #eff1f4, #0e0e12 calc(var(--nav-mix, 0) * 100%));
+```
+
+**Endpoints are fully opaque** (`#eff1f4` near-white, `#0e0e12` ink). Mixing through translucent colors makes the result semi-transparent and renders darker than expected on light surfaces — that was a bug we hit. Don't reintroduce alpha into either endpoint.
+
+**Routing logic** in `Nav.tsx`:
+
+- `LIGHT_ROUTES` = every route except `/`. On these, mix is pinned to `1` immediately (full ink at scroll-top).
+- On `/` (home dark hero): mix derives from section-overlap with the band `[NAV_TOP - NAV_BAND, NAV_TOP + 2·NAV_BAND]` and rises smoothly through `smoothstep` as the user scrolls past the dark hero into light sections.
+
+`--nav-lift` is currently unused in CSS but exposed for future scroll-driven decoration. `LIFT_SCROLL = 600` is the scroll budget if it's ever needed for a `MIX_FLOOR + (1 - MIX_FLOOR) * lift` style transition (we tried and rejected this; ink-on-light reads better than gray).
+
+### 11.2 Server / Client split — IntegrationsView pattern
+
+`IntegrationsView` is **server** and inlines all ~210 brand SVGs as static HTML by invoking `BrandIcon` at render time. Brand-paths.ts is a 110 kB module containing every SVG body — keeping it on the server prevents it shipping in the JS bundle.
+
+`IntegrationsFilter` is **client**. Receives the card list as `children`, reads `data-name` / `data-category` / `data-hint` props for filter state, and renders the visible subset. Same pattern applies to any future page that combines a heavy data module with a thin filter UI.
+
+The split dropped `/integrations` First Load JS from **216 kB → 108 kB**.
 
 Each is ≤ 200 lines TSX. Marketing-only sections (`ChiefOfStaff`, `Architecture`, `Agents`, `Pipeline`, `Apps`, `FinalCTA`) live in `src/components/sections/`.
 
@@ -312,21 +427,23 @@ Phase 3 → cobalt edge opacity pulse, 4s loop, infinite
 
 These come from `make-interfaces-feel-better` and `emil-design-eng`, applied **inside** Sentra's refusal system.
 
-| Detail                        | Application in Sentra                                                                                                                            |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Tabular numerals**          | `font-feature-settings: "tnum" 1` on `.mono-label`, `.mono-meta`, `PageMeta` clock, section counters. Prevents jitter.                           |
-| **`text-wrap: balance`**      | Every display heading.                                                                                                                           |
-| **`text-wrap: pretty`**       | Lede paragraphs. Avoids orphans where browsers support it.                                                                                       |
-| **Font smoothing**            | `-webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility` on `<body>`.                                                           |
-| **Optical alignment**         | The cap-height bar in the wordmark must visually align to the cap-height of the "S" in _Sentra_ — not the bounding box. Adjust ~0.5px if needed. |
-| **Image outlines**            | 1px `rgba(0,0,0,0.1)` outline on canvas, video, and images. Never tinted.                                                                        |
-| **Halftone overlay**          | `image-rendering: -webkit-optimize-contrast` so the 6px dots stay crisp on retina.                                                               |
-| **Skip animation on hydrate** | `initial={false}` on `AnimatePresence` for any element whose first state is "already visible."                                                   |
-| **Hit areas**                 | ≥ 40×40px on all interactive elements. `::after` pseudo-element where the visible target is smaller.                                             |
-| **Stagger entrance**          | Hero is one orchestrated reveal, not scattered fades. Motion `staggerChildren`.                                                                  |
-| **Reduced motion**            | `useReducedMotion()` plumbed through HeroChrome (freeze frame), AsciiBlock (instant), ContextGraph (final state), and all entrance animations.   |
-| **Interruptible transitions** | All hover/focus state changes use CSS `transition`, not keyframes — they can be interrupted mid-animation.                                       |
-| **No `transition: all`**      | Specify exact properties (`background`, `color`, `border-color`, `border-width`).                                                                |
+| Detail                        | Application in Sentra                                                                                                                                                                                                         |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tabular numerals**          | `font-feature-settings: "tnum" 1` on `.mono-label`, `.mono-meta`, `PageMeta` clock, section counters. Prevents jitter.                                                                                                        |
+| **`text-wrap: balance`**      | Every display heading.                                                                                                                                                                                                        |
+| **`text-wrap: pretty`**       | Lede paragraphs. Avoids orphans where browsers support it.                                                                                                                                                                    |
+| **Font smoothing**            | `-webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility` on `<body>`.                                                                                                                                        |
+| **Optical alignment**         | The cap-height bar in the wordmark must visually align to the cap-height of the "S" in _Sentra_ — not the bounding box. Adjust ~0.5px if needed.                                                                              |
+| **Image outlines**            | 1px `rgba(0,0,0,0.1)` outline on canvas, video, and images. Never tinted.                                                                                                                                                     |
+| **Halftone overlay**          | `image-rendering: -webkit-optimize-contrast` so the 6px dots stay crisp on retina.                                                                                                                                            |
+| **Skip animation on hydrate** | `initial={false}` on `AnimatePresence` for any element whose first state is "already visible."                                                                                                                                |
+| **Hit areas**                 | ≥ 40×40px on all interactive elements. Use `::before` (transparent, absolute, `inset: -8px -4px`) on `.nav-cta`, `.nav-link`, `.int-pill`, `.int-category`, `.int-more`. `::after` reserved for the hover underline on links. |
+| **Dark-surface tokens**       | Never write raw `rgba(239, 241, 244, …)` on dark grounds. Use `--ink-d-strong / body / muted / faint / edge / hush`. Same rule for hairline strengths.                                                                        |
+| **No raw hex on dark**        | `#fff` is allowed on dark surfaces only when paired with explicit hover/state tokens. Prefer `var(--ink-d-strong)` for static text.                                                                                           |
+| **Stagger entrance**          | Hero is one orchestrated reveal, not scattered fades. Motion `staggerChildren`.                                                                                                                                               |
+| **Reduced motion**            | `useReducedMotion()` plumbed through HeroChrome (freeze frame), AsciiBlock (instant), ContextGraph (final state), and all entrance animations.                                                                                |
+| **Interruptible transitions** | All hover/focus state changes use CSS `transition`, not keyframes — they can be interrupted mid-animation.                                                                                                                    |
+| **No `transition: all`**      | Specify exact properties (`background`, `color`, `border-color`, `border-width`).                                                                                                                                             |
 
 ### Where Emil's polish principles **don't** apply (intentional)
 
@@ -341,7 +458,7 @@ These come from `make-interfaces-feel-better` and `emil-design-eng`, applied **i
 
 | Primitive       | CSS class                                                | Use                                            |
 | --------------- | -------------------------------------------------------- | ---------------------------------------------- |
-| Container       | `.container` (`max-width: 1280px; padding-inline: 24px`) | Every section root.                            |
+| Container       | `.container` (`max-width: 1200px; padding-inline: 32px`) | Every section root.                            |
 | Grid            | `.grid-12`                                               | When the explicit grid needs to be visible.    |
 | Page meta       | `.page-meta`                                             | Fixed top strip with mix-blend-difference.     |
 | Section number  | `.section-number`                                        | Bottom-right `NN / 09` badge on every section. |
@@ -436,3 +553,115 @@ These are as load-bearing as the positives.
 - **Not loud.** Type weights cap at 600. Display caps at 80px. Confidence comes from precision, not scale.
 
 The moment the system adds a second accent color, a stock illustration, a rounded card, or an icon — it stops being Sentra and becomes generic enterprise software. The whole point is that it refuses to.
+
+---
+
+## 19. Implementation conventions
+
+These are the rules the shipping codebase follows. Don't deviate without updating this section.
+
+### 19.1 Routing — every page
+
+```
+src/app/
+  layout.tsx              minimal: <html><body>{children}</body></html> + fonts + metadata baseline
+  page.tsx                home — Nav + Hero + 8 sections + FinalCTA
+  blog/page.tsx
+  demo/page.tsx
+  manifesto/page.tsx
+  research/page.tsx
+  integrations/page.tsx
+  terms/page.tsx
+  privacy/page.tsx
+  data-privacy/page.tsx
+  not-found.tsx           branded 404 with Nav + FinalCTA
+  sitemap.ts              auto-renders /sitemap.xml from a route list
+  robots.ts               auto-renders /robots.txt
+```
+
+**Every `page.tsx` must export `metadata`** built via `createMetadata({ canonical: "/path" })` from `@/utils/metadata`. The home page is no exception.
+
+**Every page composes the same shell:** `<Nav />` then route-specific body then `<FinalCTA />`. `FinalCTA` itself includes `SiteFooter`, so no separate footer needs adding.
+
+### 19.2 Navigation
+
+Internal links use `next/link`. Direct `<a href="/path">` is forbidden for any internal route — it skips client-side prefetching and breaks scroll restoration. The single exception is `<a href="#">` placeholders in `SiteFooter` cookie/preferences items.
+
+External links (`mailto:`, `https://…`) use plain `<a>`.
+
+### 19.3 Utility classes added beyond the original spec
+
+| Class         | Where used                                                | What it does                                                                   |
+| ------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `.brand-mono` | `BrandIcon` mono variants                                 | Renders SVG in `#1a1a1a` so it sits cleanly next to full-color brand logos.    |
+| `.lg-mailto`  | Legal pages (terms, privacy, data-privacy)                | `color: var(--primary); text-decoration: none; underline on hover.`            |
+| `.lg-code`    | Legal pages — inline command examples (`@sentra private`) | Mono font, primary-wash background, 1px 8px padding.                           |
+| `.lg-updated` | `LegalView` header                                        | "Last updated: …" in muted body type. Replaces the old multi-field meta strip. |
+| `.nf-eyebrow` | `not-found.tsx`                                           | Mono "404" label above the H1.                                                 |
+| `.nf-ctas`    | `not-found.tsx`                                           | Buttons row (Return home / Book demo). 32px top, 16px gap, flex-wrap.          |
+
+### 19.4 SEO — owned by the framework
+
+- **Sitemap** — `src/app/sitemap.ts` exports a function returning every public route. Next.js renders `/sitemap.xml` at build time. Update the route list when adding pages.
+- **Robots** — `src/app/robots.ts` exports a function returning `{ rules, sitemap, host }`. Renders `/robots.txt`.
+- **404** — `src/app/not-found.tsx` carries `metadata.robots = { index: false, follow: false }` so the 404 doesn't appear in search.
+- **Per-page metadata** — every page calls `createMetadata({ canonical })`. The shared title/description/og live in `src/utils/metadata.ts`.
+
+### 19.5 Drift guard — `pnpm lint:design`
+
+`scripts/lint-design.sh` runs as part of `pnpm lint`. It fails the build on:
+
+- `font-size: <px>;` outside `11/12/14/16/18/24/32/40/56/80`
+- `font-size: clamp(<a>, <vw>, <b>);` where either bound is off-token
+- `gap: <px>` outside `0/4/8/12/16/24/32/48/64/96/128`
+- `margin-top: <px>` outside the same scale
+- Raw `rgba(239, 241, 244, 0.<92|78|55|45|22|16|32>)` on dark surfaces (must use `--ink-d-*`)
+
+**Escape hatch:** append `/* optical */` to a line for a 1–2px optical fine-tune. Use sparingly and explain why in the comment.
+
+### 19.6 Server / client component policy
+
+Default to server. Add `"use client"` only when one of these is true:
+
+- The component uses `useState` / `useEffect` / `useRef` / event handlers
+- The component reads `usePathname` / `useRouter` / other client-only Next.js hooks
+- The component renders a Web API directly (canvas, IntersectionObserver, scroll handlers)
+
+Currently `"use client"`: `Nav`, `Pipeline`, `Functions`, `DemoForm`, `IntegrationsFilter`. Everything else is server-rendered.
+
+### 19.7 Spacing tokens (canonical reference)
+
+Every CSS rule that touches a vertical section padding must use one of these. Raw px will fail `lint:design` for sections defined within the codebase (Justin policy, not Next.js).
+
+| Token                    | Value | Use                                                              |
+| ------------------------ | ----- | ---------------------------------------------------------------- |
+| `--section-major`        | 96px  | Major content sections (`.section`, `.fn-section`, agents grid). |
+| `--section-sub`          | 64px  | Sub-sections, transitions, between block + heading.              |
+| `--section-inline`       | 48px  | Inline boxes, ASCII blocks, axiom strips, mb-cell.               |
+| `--section-top`          | 192px | Subpage first section under fixed nav (drops well below nav).    |
+| `--section-top-sm`       | 128px | Subpage page top on narrow viewports (≤ 760px).                  |
+| `--section-top-final`    | 128px | Final-CTA hero top padding (used on home + subpages).            |
+| `--section-top-final-sm` | 96px  | Final-CTA hero top on narrow viewports.                          |
+
+Box internal padding: `--box-pad: 32px`.
+
+### 19.8 Pre-flight audit additions
+
+Add to §17 grep list:
+
+```bash
+# Internal links must use next/link
+grep -rnE "<a [^>]*href=\"/[a-z#]" src/components/ src/app/ \
+  | grep -v "href=\"#\""                                     # zero hits
+
+# Pages must export metadata
+for p in $(find src/app -name "page.tsx"); do
+  grep -q "export const metadata" "$p" || echo "MISSING: $p"
+done                                                          # zero hits
+
+# No inline styles
+grep -rn 'style=\{\{' src/                                    # zero hits
+
+# Lint:design clean
+pnpm lint:design                                              # exit 0
+```

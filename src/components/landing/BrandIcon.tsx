@@ -7,34 +7,39 @@ type Props = {
   size?: number;
 };
 
-// Stable colour from the integration name — used for the letter-monogram fallback
-// so each brand has its own consistent tile colour without bundling extra logos.
-function monogramHue(name: string) {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
-  return h % 360;
-}
-
+/**
+ * Renders a brand glyph next to an integration name.
+ *
+ * Logo + mono variants are served from /brand-svg (route handler) so the
+ * page doesn't ship hundreds of inline SVG bodies in HTML. Tile + monogram
+ * fallbacks remain inline because they're trivially small (one rect + a
+ * letter) and depend on per-name data.
+ */
 export function BrandIcon({ brandKey, name, className, size = 24 }: Props) {
   const brand = brandKey ? brandPaths[brandKey] : null;
 
-  if (brand?.kind === "logo") {
+  if (brand?.kind === "logo" || brand?.kind === "mono") {
     return (
-      <svg
-        className={className}
-        viewBox={brand.viewBox}
+      <img
+        className={`brand-img${brand.kind === "mono" ? " brand-mono" : ""}${
+          className ? ` ${className}` : ""
+        }`}
+        src={`/brand-svg?k=${encodeURIComponent(brandKey as string)}`}
+        alt={name}
         width={size}
         height={size}
-        role="img"
-        aria-label={name}
-        // gilbarbara/logos bodies are pre-rendered SVG markup with their own
-        // fills/gradients — inline as-is.
-        dangerouslySetInnerHTML={{ __html: brand.body }}
+        loading="lazy"
+        decoding="async"
       />
     );
   }
 
-  if (brand?.kind === "si") {
+  // Branded letter-tile: brand-correct colour, white initial.
+  if (brand?.kind === "tile") {
+    const initial = name
+      .replace(/[^A-Za-z0-9]/, "")
+      .charAt(0)
+      .toUpperCase();
     return (
       <svg
         className={className}
@@ -44,13 +49,23 @@ export function BrandIcon({ brandKey, name, className, size = 24 }: Props) {
         role="img"
         aria-label={name}
       >
-        <path d={brand.path} fill="currentColor" />
+        <rect x="0" y="0" width="24" height="24" rx="5" fill={brand.color} />
+        <text
+          x="12"
+          y="16.5"
+          textAnchor="middle"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          fontSize="13"
+          fontWeight="700"
+          fill="#ffffff"
+        >
+          {initial}
+        </text>
       </svg>
     );
   }
 
-  // Fallback: letter monogram tile
-  const hue = monogramHue(name);
+  // Last-resort neutral monogram (should not be hit with current data).
   const initial = name
     .replace(/[^A-Za-z0-9]/, "")
     .charAt(0)
@@ -64,24 +79,15 @@ export function BrandIcon({ brandKey, name, className, size = 24 }: Props) {
       role="img"
       aria-label={name}
     >
-      <rect
-        x="1"
-        y="1"
-        width="22"
-        height="22"
-        rx="4"
-        fill={`hsl(${hue} 45% 92%)`}
-        stroke={`hsl(${hue} 35% 70%)`}
-        strokeWidth="0.75"
-      />
+      <rect x="0" y="0" width="24" height="24" rx="5" fill="#e4e6ea" />
       <text
         x="12"
         y="16.5"
         textAnchor="middle"
         fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="12"
-        fontWeight="600"
-        fill={`hsl(${hue} 50% 28%)`}
+        fontSize="13"
+        fontWeight="700"
+        fill="#525252"
       >
         {initial}
       </text>

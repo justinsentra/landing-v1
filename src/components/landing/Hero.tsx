@@ -1,6 +1,5 @@
-"use client";
-
 import Image from "next/image";
+import Link from "next/link";
 import { TAGLINE, DEMO_HREF, DEMO_LABEL } from "@/data/site";
 import { DarkBackdrop } from "./DarkBackdrop";
 
@@ -23,7 +22,6 @@ export default function Hero() {
   return (
     <section className="hero" data-screen-label="Hero" data-nav-theme="dark">
       <DarkBackdrop variant="hero" />
-      <div className="hero-divider" aria-hidden="true" />
 
       <div className="hero-inner">
         <div className="hero-frame">
@@ -33,9 +31,9 @@ export default function Hero() {
             and structures it into a single queryable graph.
           </p>
           <div className="ctas">
-            <a className="btn btn-solid" href={DEMO_HREF}>
+            <Link className="btn btn-solid" href={DEMO_HREF}>
               {DEMO_LABEL}
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -50,7 +48,8 @@ export default function Hero() {
                 width={i.width}
                 height={i.height}
                 className="hero-backed-logo"
-                priority
+                loading="lazy"
+                fetchPriority="low"
               />
             ))}
           </div>

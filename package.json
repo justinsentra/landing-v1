@@ -6,26 +6,26 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
+    "gen:brands": "node scripts/gen-brand-paths.js",
+    "prebuild": "pnpm gen:brands",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint && pnpm lint:design",
+    "lint:design": "bash scripts/lint-design.sh"
   },
   "dependencies": {
-    "@iconify-json/arcticons": "^1.2.53",
-    "@iconify-json/cib": "^1.2.3",
-    "@iconify-json/devicon": "^1.2.62",
-    "@iconify-json/fa6-brands": "^1.2.6",
-    "@iconify-json/logos": "^1.2.11",
-    "@iconify-json/simple-icons": "^1.2.81",
-    "@iconify-json/skill-icons": "^1.2.4",
     "clsx": "^2.1.1",
     "next": "15.5.9",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "simple-icons": "^16.18.1",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@iconify-json/arcticons": "^1.2.53",
+    "@iconify-json/cib": "^1.2.3",
+    "@iconify-json/fa6-brands": "^1.2.6",
+    "@iconify-json/logos": "^1.2.11",
+    "@iconify-json/simple-icons": "^1.2.81",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

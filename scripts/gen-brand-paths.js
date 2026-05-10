@@ -1,551 +1,658 @@
-// One-shot generator: emits src/data/brand-paths.ts and src/data/integrations.ts
+// One-shot generator: emits src/data/brand-paths.ts and src/data/integrations.ts.
+// Resolves icons by chaining several open icon sets, then a small set of custom
+// brand-tile fallbacks (letter mark in the brand's actual public colour) for
+// the long tail of niche SaaS tools that aren't in any open icon library.
 // Run: node scripts/gen-brand-paths.js
 const fs = require("fs");
 const path = require("path");
 const logosSet = require("@iconify-json/logos/icons.json");
 const siSet = require("@iconify-json/simple-icons/icons.json");
+const cibSet = require("@iconify-json/cib/icons.json");
+const arcSet = require("@iconify-json/arcticons/icons.json");
+const faSet = require("@iconify-json/fa6-brands/icons.json");
 
-// Tuple: [name, category, hint, logosSlug?, siSlug?]
-// logosSlug = gilbarbara/logos (full-colour). siSlug = simple-icons (mono).
-// null = letter monogram fallback.
+// Tuple: [name, category, hint, attempts[]]
+// attempts is an ordered list of [setName, slug] pairs to try. The first hit
+// wins; if all miss, BrandIcon falls back to a coloured letter tile (see
+// BRAND_TILE below for niche tools that have no open icon set entry).
 const ORDERED = [
-  // tier A — user-pinned popular first
-  ["Gmail", "Email", "Triage priority threads", "google-gmail", "gmail"],
-  ["Outlook", "Email", "Triage priority threads", null, null],
+  // ─────────── tier A — user-pinned popular first ───────────
+  ["Gmail", "Email", "Triage priority threads", [["logos", "google-gmail"]]],
+  [
+    "Outlook",
+    "Email",
+    "Triage priority threads",
+    [["arc", "microsoft-outlook"]],
+  ],
   [
     "Google Calendar",
     "Calendar",
     "Find time, book meetings",
-    "google-calendar",
-    "googlecalendar",
+    [["logos", "google-calendar"]],
   ],
   [
     "Google Drive",
     "Storage",
     "Pull the right files",
-    "google-drive",
-    "googledrive",
+    [["logos", "google-drive"]],
   ],
   [
     "Google Sheets",
     "Spreadsheets",
     "Read ranges, append rows",
-    null,
-    "googlesheets",
+    [["si", "googlesheets"]],
   ],
   [
     "Supabase",
     "Databases",
     "Query databases, manage tables",
-    "supabase-icon",
-    "supabase",
+    [["logos", "supabase-icon"]],
   ],
   [
     "Notion",
     "Productivity",
     "Search pages, append blocks",
-    "notion-icon",
-    "notion",
+    [["logos", "notion-icon"]],
   ],
-  ["Slack", "Messaging", "Post updates, watch channels", "slack-icon", null],
+  [
+    "Slack",
+    "Messaging",
+    "Post updates, watch channels",
+    [["logos", "slack-icon"]],
+  ],
   [
     "Airtable",
     "Databases",
     "Query records, append rows",
-    "airtable",
-    "airtable",
+    [["logos", "airtable"]],
   ],
   [
     "Google Docs",
     "Documents",
     "Land output in a shared doc",
-    null,
-    "googledocs",
+    [["si", "googledocs"]],
   ],
-  ["HubSpot", "CRM", "Drive deal motion forward", "hubspot", "hubspot"],
-  ["Salesforce", "CRM", "Drive accounts and opps", "salesforce", null],
+  ["HubSpot", "CRM", "Drive deal motion forward", [["logos", "hubspot"]]],
+  ["Salesforce", "CRM", "Drive accounts and opps", [["logos", "salesforce"]]],
 
-  // tier B — extremely popular
+  // ─────────── tier B — extremely popular ───────────
   [
     "GitHub",
     "Development",
     "Watch PRs, surface owners",
-    "github-icon",
-    "github",
+    [["logos", "github-icon"]],
   ],
   [
     "Linear",
     "Project Management",
     "Move issues, ship cycles",
-    "linear",
-    "linear",
+    [["logos", "linear"]],
   ],
-  ["Jira", "Project Management", "Move tickets, track sprints", "jira", "jira"],
+  [
+    "Jira",
+    "Project Management",
+    "Move tickets, track sprints",
+    [["logos", "jira"]],
+  ],
   [
     "Asana",
     "Project Management",
     "Track tasks, manage projects",
-    "asana",
-    "asana",
+    [["logos", "asana"]],
   ],
-  ["Figma", "Design", "Watch comments, pull frames", "figma", "figma"],
-  ["Zoom", "Video Conferencing", "Spin up call links", "zoom-icon", "zoom"],
+  ["Figma", "Design", "Watch comments, pull frames", [["logos", "figma"]]],
+  [
+    "Zoom",
+    "Video Conferencing",
+    "Spin up call links",
+    [["logos", "zoom-icon"]],
+  ],
   [
     "Microsoft Teams",
     "Messaging",
     "Post updates, watch channels",
-    "microsoft-teams",
-    null,
+    [["logos", "microsoft-teams"]],
   ],
   [
     "Discord",
     "Messaging",
     "Post updates, watch channels",
-    "discord-icon",
-    "discord",
+    [["logos", "discord-icon"]],
   ],
-  ["ChatGPT", "AI", "Reason over context", "openai-icon", null],
-  ["OpenAI", "AI", "Reason over context", "openai-icon", null],
-  ["Anthropic", "AI", "Run grounded reasoning", "anthropic", "anthropic"],
-  ["Stripe", "Finance", "Watch payments and revenue", "stripe", "stripe"],
+  ["ChatGPT", "AI", "Reason over context", [["logos", "openai-icon"]]],
+  ["OpenAI", "AI", "Reason over context", [["logos", "openai-icon"]]],
+  ["Anthropic", "AI", "Run grounded reasoning", [["logos", "anthropic"]]],
+  ["Stripe", "Finance", "Watch payments and revenue", [["logos", "stripe"]]],
   [
     "Shopify",
     "Ecommerce",
     "Query orders, manage products",
-    "shopify",
-    "shopify",
+    [["logos", "shopify"]],
   ],
   [
     "Calendly",
     "Scheduling",
     "Check meetings, manage event types",
-    null,
-    "calendly",
+    [["si", "calendly"]],
   ],
-  ["Dropbox", "Storage", "Find files, pull context", "dropbox", "dropbox"],
-  ["Loom", "Video", "Pull recordings in context", "loom", "loom"],
+  ["Dropbox", "Storage", "Find files, pull context", [["logos", "dropbox"]]],
+  ["Loom", "Video", "Pull recordings in context", [["logos", "loom"]]],
   [
     "Confluence",
     "Documents",
     "Search wikis, attach evidence",
-    "confluence",
-    "confluence",
+    [["logos", "confluence"]],
   ],
   [
     "Intercom",
     "Support",
     "Manage conversations, track customers",
-    "intercom-icon",
-    "intercom",
+    [["logos", "intercom-icon"]],
   ],
   [
     "Zendesk",
     "Support",
     "Search tickets, manage support",
-    "zendesk-icon",
-    "zendesk",
+    [["logos", "zendesk-icon"]],
   ],
-  ["Pipedrive", "CRM", "Move deals through pipeline", "pipedrive", null],
-  ["Vercel", "Cloud", "Watch builds and deploys", "vercel-icon", "vercel"],
-  ["AWS", "Cloud", "Inspect resources, run jobs", "aws", null],
+  ["Pipedrive", "CRM", "Move deals through pipeline", [["logos", "pipedrive"]]],
+  ["Vercel", "Cloud", "Watch builds and deploys", [["logos", "vercel-icon"]]],
+  ["AWS", "Cloud", "Inspect resources, run jobs", [["logos", "aws"]]],
   [
     "Datadog",
     "Observability",
     "Watch metrics, surface anomalies",
-    "datadog",
-    "datadog",
+    [["logos", "datadog"]],
   ],
   [
     "Sentry",
     "Observability",
     "Monitor errors, triage by impact",
-    "sentry-icon",
-    "sentry",
+    [["logos", "sentry-icon"]],
   ],
-  ["Posthog", "Analytics", "Watch product behavior", "posthog-icon", "posthog"],
-  ["Amplitude", "Analytics", "Watch event funnels", "amplitude-icon", null],
+  [
+    "Posthog",
+    "Analytics",
+    "Watch product behavior",
+    [["logos", "posthog-icon"]],
+  ],
+  [
+    "Amplitude",
+    "Analytics",
+    "Watch event funnels",
+    [["logos", "amplitude-icon"]],
+  ],
   [
     "Mailchimp",
     "Marketing",
     "Trigger sends, segment lists",
-    "mailchimp",
-    "mailchimp",
+    [["logos", "mailchimp"]],
   ],
-  ["Twitter", "Social Media", "Watch posts and replies", "twitter", "x"],
+  [
+    "Twitter",
+    "Social Media",
+    "Watch posts and replies",
+    [["logos", "twitter"]],
+  ],
   [
     "LinkedIn",
     "Social Media",
     "Watch reach and replies",
-    "linkedin-icon",
-    "linkedin",
+    [["logos", "linkedin-icon"]],
   ],
   [
     "WhatsApp",
     "Messaging",
     "Reply on the right thread",
-    "whatsapp-icon",
-    "whatsapp",
+    [["logos", "whatsapp-icon"]],
   ],
 
-  // tier C — common
-  ["GitLab", "Development", "Track pipelines and MRs", "gitlab", "gitlab"],
+  // ─────────── tier C — common ───────────
+  ["GitLab", "Development", "Track pipelines and MRs", [["logos", "gitlab"]]],
   [
     "Bitbucket",
     "Development",
     "Watch PRs, ship faster",
-    "bitbucket",
-    "bitbucket",
+    [["logos", "bitbucket"]],
   ],
   [
     "ClickUp",
     "Project Management",
     "Move tasks, track progress",
-    null,
-    "clickup",
+    [["arc", "clickup"]],
   ],
   [
     "Trello",
     "Project Management",
     "Track boards, lists, cards",
-    "trello",
-    "trello",
+    [["logos", "trello"]],
   ],
   [
     "Monday",
     "Project Management",
     "Move items across boards",
-    "monday-icon",
-    null,
+    [["logos", "monday-icon"]],
   ],
-  ["Cal.com", "Scheduling", "Find time, book slots", null, "caldotcom"],
-  ["Box", "Storage", "Search files, pull context", "box", "box"],
+  ["Cal.com", "Scheduling", "Find time, book slots", [["si", "caldotcom"]]],
+  ["Box", "Storage", "Search files, pull context", [["logos", "box"]]],
   [
     "OneDrive",
     "Storage",
     "Find files, pull context",
-    "microsoft-onedrive",
-    null,
+    [["logos", "microsoft-onedrive"]],
   ],
-  ["Front", "Support", "Drop the next reply", "frontapp", null],
-  ["Freshdesk", "Support", "Triage and answer tickets", null, null],
-  ["ServiceNow", "Support", "Move tickets through queues", null, null],
-  ["Apollo", "Sales", "Enrich the next outreach", null, null],
-  ["Clay", "Sales", "Enrich every contact", null, null],
-  ["Gong", "Sales", "Pull call moments", null, null],
-  ["Close", "CRM", "Drive deal motion forward", "close", null],
-  ["Attio", "CRM", "Manage contacts, companies, deals", null, null],
-  ["Azure", "Cloud", "Manage tenants and runs", "microsoft-azure", null],
-  ["Netlify", "Cloud", "Watch builds and deploys", "netlify", "netlify"],
-  ["Heroku", "Cloud", "Watch dynos and releases", "heroku-icon", "heroku"],
+  ["Front", "Support", "Drop the next reply", [["logos", "frontapp"]]],
+  ["Freshdesk", "Support", "Triage and answer tickets", []],
+  ["ServiceNow", "Support", "Move tickets through queues", []],
+  ["Apollo", "Sales", "Enrich the next outreach", []],
+  ["Clay", "Sales", "Enrich every contact", []],
+  ["Gong", "Sales", "Pull call moments", []],
+  ["Close", "CRM", "Drive deal motion forward", [["logos", "close"]]],
+  ["Attio", "CRM", "Manage contacts, companies, deals", []],
+  ["Azure", "Cloud", "Manage tenants and runs", [["logos", "microsoft-azure"]]],
+  ["Netlify", "Cloud", "Watch builds and deploys", [["logos", "netlify"]]],
+  ["Heroku", "Cloud", "Watch dynos and releases", [["logos", "heroku-icon"]]],
   [
     "PagerDuty",
     "Observability",
     "Watch incidents, route owners",
-    "pagerduty",
-    "pagerduty",
+    [["logos", "pagerduty"]],
   ],
   [
     "New Relic",
     "Observability",
     "Watch performance signals",
-    "new-relic",
-    "newrelic",
+    [["logos", "new-relic"]],
   ],
-  ["Segment", "Analytics", "Track events across stack", "segment", null],
-  ["Tableau", "Analytics", "Surface dashboard signals", "tableau-icon", null],
+  ["Segment", "Analytics", "Track events across stack", [["logos", "segment"]]],
+  [
+    "Tableau",
+    "Analytics",
+    "Surface dashboard signals",
+    [["logos", "tableau-icon"]],
+  ],
   [
     "Google Analytics",
     "Analytics",
     "Track traffic in context",
-    "google-analytics",
-    "googleanalytics",
+    [["logos", "google-analytics"]],
   ],
   [
     "Snowflake",
     "Databases",
     "Run analytical queries",
-    "snowflake-icon",
-    "snowflake",
+    [["logos", "snowflake-icon"]],
   ],
   [
     "Google Bigquery",
     "Databases",
     "Run analytical queries",
-    null,
-    "googlebigquery",
+    [["si", "googlebigquery"]],
   ],
-  ["MongoDB", "Databases", "Query collections fast", "mongodb-icon", "mongodb"],
+  [
+    "MongoDB",
+    "Databases",
+    "Query collections fast",
+    [["logos", "mongodb-icon"]],
+  ],
   [
     "PostgreSQL",
     "Databases",
     "Run queries on demand",
-    "postgresql",
-    "postgresql",
+    [["logos", "postgresql"]],
   ],
-  ["MySQL", "Databases", "Run queries on demand", "mysql-icon", "mysql"],
-  ["Pinecone", "Databases", "Query semantic memory", "pinecone", null],
-  ["Firebase", "Databases", "Read realtime data", "firebase", "firebase"],
-  ["Mercury", "Finance", "Watch balances and flows", null, null],
-  ["Ramp", "Finance", "Watch spend and bills", null, null],
-  ["Quickbooks", "Finance", "Surface invoices and bills", null, "quickbooks"],
-  ["Xero", "Finance", "Pull invoices and expenses", "xero", "xero"],
-  ["Plaid", "Finance", "Resolve account activity", null, null],
-  ["Square", "Finance", "Watch sales and payouts", "square", "square"],
-  ["Webflow", "CMS", "Update content live", "webflow", "webflow"],
+  ["MySQL", "Databases", "Run queries on demand", [["logos", "mysql-icon"]]],
+  ["Pinecone", "Databases", "Query semantic memory", [["logos", "pinecone"]]],
+  ["Firebase", "Databases", "Read realtime data", [["logos", "firebase"]]],
+  ["Mercury", "Finance", "Watch balances and flows", []],
+  ["Ramp", "Finance", "Watch spend and bills", []],
+  [
+    "Quickbooks",
+    "Finance",
+    "Surface invoices and bills",
+    [["si", "quickbooks"]],
+  ],
+  ["Xero", "Finance", "Pull invoices and expenses", [["logos", "xero"]]],
+  ["Plaid", "Finance", "Resolve account activity", []],
+  ["Square", "Finance", "Watch sales and payouts", [["logos", "square"]]],
+  ["Webflow", "CMS", "Update content live", [["logos", "webflow"]]],
   [
     "WordPress",
     "CMS",
     "Publish and update posts",
-    "wordpress-icon",
-    "wordpress",
+    [["logos", "wordpress-icon"]],
   ],
-  ["Make", "Automation", "Trigger downstream scenarios", null, "make"],
-  ["Zapier", "Automation", "Trigger downstream zaps", "zapier-icon", "zapier"],
-  ["Composio", "Integration Platform", "Wire any tool quickly", null, null],
-  ["Perplexity", "AI", "Pull cited answers", "perplexity-icon", "perplexity"],
+  ["Make", "Automation", "Trigger downstream scenarios", [["si", "make"]]],
   [
-    "Hugging Face",
-    "AI",
-    "Run hosted models",
-    "hugging-face-icon",
-    "huggingface",
+    "Zapier",
+    "Automation",
+    "Trigger downstream zaps",
+    [["logos", "zapier-icon"]],
   ],
-  ["Replicate", "AI", "Run hosted model inference", null, "replicate"],
-  ["ElevenLabs", "AI", "Generate spoken output", null, "elevenlabs"],
-  ["DeepL", "AI", "Translate the next reply", null, "deepl"],
-  ["Typeform", "Forms", "Pull form responses in", "typeform-icon", "typeform"],
-  ["Granola", "Productivity", "Pull meeting notes in", null, null],
-  ["Fireflies", "Productivity", "Capture meeting transcripts", null, null],
-  ["BambooHR", "HR", "Sync people data", null, null],
-  ["Greenhouse", "HR", "Move candidates through stages", null, "greenhouse"],
-  ["Workday", "HR", "Sync workforce records", null, null],
-  ["Rippling", "HR", "Sync people and access", null, null],
-  ["Lever", "HR", "Track candidate momentum", null, null],
-  ["Ashby", "HR", "Move candidates forward", null, null],
+  ["Composio", "Integration Platform", "Wire any tool quickly", []],
+  ["Perplexity", "AI", "Pull cited answers", [["logos", "perplexity-icon"]]],
+  ["Hugging Face", "AI", "Run hosted models", [["logos", "hugging-face-icon"]]],
+  ["Replicate", "AI", "Run hosted model inference", [["si", "replicate"]]],
+  ["ElevenLabs", "AI", "Generate spoken output", [["si", "elevenlabs"]]],
+  ["DeepL", "AI", "Translate the next reply", [["si", "deepl"]]],
+  ["Typeform", "Forms", "Pull form responses in", [["logos", "typeform-icon"]]],
+  ["Granola", "Productivity", "Pull meeting notes in", []],
+  ["Fireflies", "Productivity", "Capture meeting transcripts", []],
+  ["BambooHR", "HR", "Sync people data", [["arc", "bamboohr"]]],
+  [
+    "Greenhouse",
+    "HR",
+    "Move candidates through stages",
+    [["si", "greenhouse"]],
+  ],
+  ["Workday", "HR", "Sync workforce records", [["arc", "workday"]]],
+  ["Rippling", "HR", "Sync people and access", []],
+  ["Lever", "HR", "Track candidate momentum", []],
+  ["Ashby", "HR", "Move candidates forward", []],
   [
     "Reddit",
     "Social Media",
     "Watch threads worth replying to",
-    "reddit-icon",
-    "reddit",
+    [["logos", "reddit-icon"]],
   ],
-  ["Facebook", "Social Media", "Pull page activity", "facebook", "facebook"],
+  ["Facebook", "Social Media", "Pull page activity", [["logos", "facebook"]]],
   [
     "Instagram",
     "Social Media",
     "Watch posts and DMs",
-    "instagram-icon",
-    "instagram",
+    [["logos", "instagram-icon"]],
   ],
-  ["TikTok", "Social Media", "Track post performance", "tiktok-icon", "tiktok"],
-  ["YouTube", "Media", "Watch video performance", "youtube-icon", "youtube"],
-  ["Spotify", "Media", "Pull listening context", "spotify-icon", "spotify"],
+  [
+    "TikTok",
+    "Social Media",
+    "Track post performance",
+    [["logos", "tiktok-icon"]],
+  ],
+  ["YouTube", "Media", "Watch video performance", [["logos", "youtube-icon"]]],
+  ["Spotify", "Media", "Pull listening context", [["logos", "spotify-icon"]]],
 
-  // tier D — long tail
+  // ─────────── tier D — long tail ───────────
   [
     "Active Campaign",
     "Marketing",
     "Trigger sends, segment lists",
-    "active-campaign",
-    null,
+    [["logos", "active-campaign"]],
   ],
-  ["Adobe", "Design", "Pull asset metadata", "adobe", null],
-  ["Affinity", "CRM", "Update relationship intel", null, null],
-  ["Ahrefs", "Marketing", "Track ranking shifts", null, null],
-  ["Algolia", "Search", "Index live content", "algolia", "algolia"],
-  ["Alpha Vantage", "Finance", "Pull market quotes", null, null],
+  ["Adobe", "Design", "Pull asset metadata", [["logos", "adobe"]]],
+  ["Affinity", "CRM", "Update relationship intel", []],
+  ["Ahrefs", "Marketing", "Track ranking shifts", []],
+  ["Algolia", "Search", "Index live content", [["logos", "algolia"]]],
+  ["Alpha Vantage", "Finance", "Pull market quotes", []],
   [
     "Atlassian",
     "Development",
     "Wire issues to context",
-    "atlassian",
-    "atlassian",
+    [["logos", "atlassian"]],
   ],
-  ["Auth0", "Authentication", "Audit identity events", "auth0-icon", "auth0"],
-  ["Baserow", "Databases", "Query, append, edit rows", null, null],
-  ["Bitly", "Marketing", "Track campaign clicks", null, "bitly"],
-  ["Brave Search", "Search", "Pull live web answers", "brave", "brave"],
-  ["Brevo", "Email", "Send transactional mail", null, null],
-  ["Browserbase", "Development", "Run headless flows", null, null],
-  ["Bubble", "Development", "Trigger workflows in app", "bubble-icon", null],
-  ["Canva", "Design", "Pull brand assets", null, null],
-  ["Canvas", "Education", "Sync course events", null, null],
-  ["Chargebee", "Finance", "Track subscription state", "chargebee", null],
-  ["Clockify", "Productivity", "Log time against work", null, "clockify"],
-  ["Coda", "Documents", "Update docs and tables", "coda", null],
-  ["Code Interpreter", "Development", "Run code on demand", null, null],
-  ["Contentful", "CMS", "Update entries at scale", "contentful", "contentful"],
-  ["Docusign", "Documents", "Send and track agreements", null, null],
-  ["Dropbox Sign", "Documents", "Send things to sign", null, null],
-  ["Dynamics 365", "CRM", "Update accounts and deals", null, null],
-  ["Elastic", "Search", "Query indexes fast", null, "elastic"],
-  ["Eventbrite", "Events", "Track registrations live", "eventbrite", null],
-  ["Exa", "Search", "Find research-grade results", null, null],
-  ["Expensify", "Finance", "Surface receipts to approve", null, null],
-  ["Firecrawl", "Web Scraping", "Pull pages on demand", null, null],
+  [
+    "Auth0",
+    "Authentication",
+    "Audit identity events",
+    [["logos", "auth0-icon"]],
+  ],
+  ["Baserow", "Databases", "Query, append, edit rows", []],
+  ["Bitly", "Marketing", "Track campaign clicks", [["si", "bitly"]]],
+  ["Brave Search", "Search", "Pull live web answers", [["logos", "brave"]]],
+  ["Brevo", "Email", "Send transactional mail", []],
+  ["Browserbase", "Development", "Run headless flows", []],
+  [
+    "Bubble",
+    "Development",
+    "Trigger workflows in app",
+    [["logos", "bubble-icon"]],
+  ],
+  ["Canva", "Design", "Pull brand assets", [["cib", "canva"]]],
+  ["Canvas", "Education", "Sync course events", [["arc", "canvas"]]],
+  [
+    "Chargebee",
+    "Finance",
+    "Track subscription state",
+    [["logos", "chargebee"]],
+  ],
+  ["Clockify", "Productivity", "Log time against work", [["si", "clockify"]]],
+  ["Coda", "Documents", "Update docs and tables", [["logos", "coda"]]],
+  ["Code Interpreter", "Development", "Run code on demand", []],
+  ["Contentful", "CMS", "Update entries at scale", [["logos", "contentful"]]],
+  ["Docusign", "Documents", "Send and track agreements", [["cib", "docusign"]]],
+  ["Dropbox Sign", "Documents", "Send things to sign", []],
+  ["Dynamics 365", "CRM", "Update accounts and deals", []],
+  ["Elastic", "Search", "Query indexes fast", [["si", "elastic"]]],
+  [
+    "Eventbrite",
+    "Events",
+    "Track registrations live",
+    [["logos", "eventbrite"]],
+  ],
+  ["Exa", "Search", "Find research-grade results", []],
+  [
+    "Expensify",
+    "Finance",
+    "Surface receipts to approve",
+    [["arc", "expensify"]],
+  ],
+  ["Firecrawl", "Web Scraping", "Pull pages on demand", []],
   [
     "Google Ads",
     "Marketing",
     "Watch campaign spend",
-    "google-ads",
-    "googleads",
+    [["logos", "google-ads"]],
   ],
-  ["Google Forms", "Forms", "Capture responses to act on", null, "googleforms"],
+  [
+    "Google Forms",
+    "Forms",
+    "Capture responses to act on",
+    [["si", "googleforms"]],
+  ],
   [
     "Google Maps",
     "Maps",
     "Resolve addresses, pull places",
-    "google-maps",
-    "googlemaps",
+    [["logos", "google-maps"]],
   ],
   [
     "Google Meet",
     "Video Conferencing",
     "Spin up call links",
-    "google-meet",
-    "googlemeet",
+    [["logos", "google-meet"]],
   ],
   [
     "Google Search Console",
     "Marketing",
     "Surface search performance",
-    "google-search-console",
-    "googlesearchconsole",
+    [["logos", "google-search-console"]],
   ],
   [
     "Google Slides",
     "Documents",
     "Build decks from live context",
-    null,
-    "googleslides",
+    [["si", "googleslides"]],
   ],
-  ["Google Tasks", "Productivity", "Capture next actions", null, "googletasks"],
-  ["Grok", "AI", "Reason over live posts", "grok", null],
-  ["Hootsuite", "Social Media", "Schedule and queue posts", null, "hootsuite"],
-  ["Jotform", "Forms", "Capture submissions live", null, null],
-  ["Klaviyo", "Marketing", "Trigger lifecycle sends", null, null],
-  ["LangChain", "AI", "Wire chains into flows", "langchain-icon", "langchain"],
-  ["Mailgun", "Email", "Send transactional mail", "mailgun-icon", "mailgun"],
-  ["MariaDB", "Databases", "Query rows on demand", "mariadb-icon", "mariadb"],
-  ["Medium", "Publishing", "Pull post performance", "medium-icon", "medium"],
-  ["Mem", "Productivity", "Capture lasting notes", null, null],
-  ["Meta Ads", "Marketing", "Watch campaign spend", "meta-icon", "meta"],
-  ["Miro", "Collaboration", "Pull board context in", "miro", "miro"],
-  ["PandaDoc", "Documents", "Send proposals to sign", null, null],
+  [
+    "Google Tasks",
+    "Productivity",
+    "Capture next actions",
+    [["si", "googletasks"]],
+  ],
+  ["Grok", "AI", "Reason over live posts", [["logos", "grok"]]],
+  [
+    "Hootsuite",
+    "Social Media",
+    "Schedule and queue posts",
+    [["si", "hootsuite"]],
+  ],
+  ["Jotform", "Forms", "Capture submissions live", []],
+  ["Klaviyo", "Marketing", "Trigger lifecycle sends", []],
+  ["LangChain", "AI", "Wire chains into flows", [["si", "langchain"]]],
+  ["Mailgun", "Email", "Send transactional mail", [["logos", "mailgun-icon"]]],
+  ["MariaDB", "Databases", "Query rows on demand", [["logos", "mariadb-icon"]]],
+  ["Medium", "Publishing", "Pull post performance", [["logos", "medium-icon"]]],
+  ["Mem", "Productivity", "Capture lasting notes", []],
+  ["Meta Ads", "Marketing", "Watch campaign spend", [["logos", "meta-icon"]]],
+  ["Miro", "Collaboration", "Pull board context in", [["logos", "miro"]]],
+  ["PandaDoc", "Documents", "Send proposals to sign", []],
   [
     "Pinterest",
     "Social Media",
     "Track pin performance",
-    "pinterest",
-    "pinterest",
+    [["logos", "pinterest"]],
   ],
-  [
-    "Razorpay",
-    "Finance",
-    "Track payments and refunds",
-    "razorpay-icon",
-    "razorpay",
-  ],
-  ["Resend", "Email", "Send transactional mail", null, "resend"],
+  ["Razorpay", "Finance", "Track payments and refunds", [["si", "razorpay"]]],
+  ["Resend", "Email", "Send transactional mail", [["si", "resend"]]],
   [
     "Rollbar",
     "Observability",
     "Monitor errors, route owners",
-    "rollbar-icon",
-    "rollbar",
+    [["logos", "rollbar-icon"]],
   ],
-  ["Sage", "Finance", "Pull ledger context", null, null],
-  ["SAP", "ERP", "Read system records", "sap", "sap"],
-  ["SendGrid", "Email", "Send transactional mail", "sendgrid", null],
+  ["Sage", "Finance", "Pull ledger context", []],
+  ["SAP", "ERP", "Read system records", [["logos", "sap"]]],
+  ["SendGrid", "Email", "Send transactional mail", [["logos", "sendgrid"]]],
   [
     "Shortcut",
     "Project Management",
     "Move stories across iterations",
-    null,
-    "shortcut",
+    [["si", "shortcut"]],
   ],
   [
     "Stack Overflow",
     "Development",
     "Pull answers in context",
-    "stackoverflow-icon",
-    "stackoverflow",
+    [["logos", "stackoverflow-icon"]],
   ],
-  ["SugarCRM", "CRM", "Drive accounts forward", null, null],
+  ["SugarCRM", "CRM", "Drive accounts forward", []],
   [
     "SurveyMonkey",
     "Forms",
     "Capture responses to act on",
-    null,
-    "surveymonkey",
+    [["si", "surveymonkey"]],
   ],
-  ["Tally", "Forms", "Capture form submissions", null, null],
-  ["Tavily", "Search", "Pull research-grade answers", null, null],
+  ["Tally", "Forms", "Capture form submissions", []],
+  ["Tavily", "Search", "Pull research-grade answers", []],
   [
     "Telegram",
     "Messaging",
     "Post updates, watch chats",
-    "telegram",
-    "telegram",
+    [["logos", "telegram"]],
   ],
   [
     "Todoist",
     "Productivity",
     "Capture next actions",
-    "todoist-icon",
-    "todoist",
+    [["logos", "todoist-icon"]],
   ],
-  ["Toggl", "Productivity", "Log time against work", "toggl-icon", "toggl"],
-  ["Twilio", "Communications", "Send SMS and calls", "twilio-icon", null],
-  ["Twitch", "Media", "Watch stream activity", "twitch", "twitch"],
-  ["Vimeo", "Video", "Pull video metadata", "vimeo-icon", "vimeo"],
-  ["Wix", "CMS", "Update content and pages", "wix", "wix"],
+  ["Toggl", "Productivity", "Log time against work", [["si", "toggl"]]],
+  [
+    "Twilio",
+    "Communications",
+    "Send SMS and calls",
+    [["logos", "twilio-icon"]],
+  ],
+  ["Twitch", "Media", "Watch stream activity", [["logos", "twitch"]]],
+  ["Vimeo", "Video", "Pull video metadata", [["logos", "vimeo-icon"]]],
+  ["Wix", "CMS", "Update content and pages", [["logos", "wix"]]],
   [
     "WooCommerce",
     "Ecommerce",
     "Track orders and stock",
-    "woocommerce-icon",
-    "woocommerce",
+    [["logos", "woocommerce-icon"]],
   ],
-  ["Wrike", "Project Management", "Move tasks through stages", null, null],
-  ["Zoho CRM", "CRM", "Drive accounts and deals", null, "zoho"],
-  ["Zoho Mail", "Email", "Triage priority threads", null, "zoho"],
+  ["Wrike", "Project Management", "Move tasks through stages", []],
+  ["Zoho CRM", "CRM", "Drive accounts and deals", [["logos", "zoho"]]],
+  ["Zoho Mail", "Email", "Triage priority threads", [["logos", "zoho"]]],
 ];
 
-function readSi(slug) {
-  const i = siSet.icons[slug];
-  if (!i) return null;
-  // body format: <path fill="currentColor" d="…"/> — d may not be first.
-  const m = i.body.match(/<path[^>]*\sd="([^"]+)"/);
-  if (!m) return null;
-  return { kind: "si", path: m[1] };
-}
+// Branded letter-mark tile for niche tools that aren't in any open icon set.
+// Uses each brand's actual public colour so the cell still feels distinct.
+// (Hex values are facts — public brand colours, not creative IP.)
+const BRAND_TILE = {
+  Freshdesk: "#25c16f",
+  ServiceNow: "#62d84e",
+  Apollo: "#1a73e8",
+  Clay: "#6c5ce7",
+  Gong: "#7c3aed",
+  Attio: "#111111",
+  Mercury: "#f4b41a",
+  Ramp: "#fec900",
+  Plaid: "#111111",
+  Composio: "#7c3aed",
+  Granola: "#f4b400",
+  Fireflies: "#ff4530",
+  Rippling: "#f9b22a",
+  Lever: "#5c47e5",
+  Ashby: "#f97316",
+  Affinity: "#1b3a4b",
+  Ahrefs: "#ff7a00",
+  "Alpha Vantage": "#0a66c2",
+  Baserow: "#5e8aff",
+  Brevo: "#0b996e",
+  Browserbase: "#111111",
+  "Code Interpreter": "#111111",
+  "Dropbox Sign": "#0061ff",
+  "Dynamics 365": "#002050",
+  Exa: "#1a1a1a",
+  Firecrawl: "#ff6b00",
+  Jotform: "#ff6100",
+  Klaviyo: "#19191a",
+  Mem: "#5b8def",
+  PandaDoc: "#28b463",
+  Sage: "#00a040",
+  SugarCRM: "#ff6c2c",
+  Tally: "#111111",
+  Tavily: "#0ea5e9",
+  Wrike: "#0e7c66",
+};
 
-function readLogo(slug) {
-  const i = logosSet.icons[slug];
+const SETS = {
+  logos: logosSet,
+  si: siSet,
+  cib: cibSet,
+  arc: arcSet,
+  fa: faSet,
+};
+
+function readFromSet(setName, slug) {
+  const set = SETS[setName];
+  if (!set) return null;
+  const i = set.icons[slug];
   if (!i) return null;
-  const w = i.width || logosSet.width || 256;
-  const h = i.height || logosSet.height || 256;
-  return { kind: "logo", body: i.body, viewBox: `0 0 ${w} ${h}` };
+  if (setName === "logos") {
+    // gilbarbara/logos: full-colour, inline body as-is.
+    const w = i.width || set.width || 256;
+    const h = i.height || set.height || 256;
+    return { kind: "logo", body: i.body, viewBox: `0 0 ${w} ${h}` };
+  }
+  // Mono sets (si/cib/arc/fa): one or more <path>; recolour via currentColor.
+  // Strip explicit fills so CSS `color` controls the rendered hue.
+  const body = i.body.replace(/\sfill="[^"]*"/g, "");
+  const w = i.width || set.width || 24;
+  const h = i.height || set.height || 24;
+  return { kind: "mono", body, viewBox: `0 0 ${w} ${h}` };
 }
 
 const result = {};
 const integrations = [];
 const misses = [];
 
-for (const [name, category, hint, logoSlug, siSlug] of ORDERED) {
+for (const [name, category, hint, attempts] of ORDERED) {
   let key = null;
-  let icon = null;
-  if (logoSlug) {
-    icon = readLogo(logoSlug);
-    if (icon) key = `l:${logoSlug}`;
+  for (const [setName, slug] of attempts) {
+    const icon = readFromSet(setName, slug);
+    if (icon) {
+      key = `${setName}:${slug}`;
+      if (!result[key]) result[key] = icon;
+      break;
+    }
   }
-  if (!icon && siSlug) {
-    icon = readSi(siSlug);
-    if (icon) key = `s:${siSlug}`;
+  if (!key && BRAND_TILE[name]) {
+    key = `tile:${name}`;
+    result[key] = { kind: "tile", color: BRAND_TILE[name] };
   }
   integrations.push({ name, category, hint, key });
-  if (key && !result[key]) result[key] = icon;
   if (!key) misses.push(name);
 }
 
@@ -555,12 +662,13 @@ fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(
   path.join(outDir, "brand-paths.ts"),
   `// AUTO-GENERATED by scripts/gen-brand-paths.js — do not edit by hand.\n` +
-    `// Sources: @iconify-json/logos (gilbarbara/logos, MIT) and\n` +
-    `// @iconify-json/simple-icons (CC0). Brand logos used to indicate\n` +
+    `// Sources: gilbarbara/logos, simple-icons, CoreUI Brand Icons, Arcticons,\n` +
+    `// FontAwesome 6 Brands. Brand identifying marks used to indicate\n` +
     `// integration support — standard nominative use.\n\n` +
     `export type LogoBrand = { kind: "logo"; body: string; viewBox: string };\n` +
-    `export type SiBrand = { kind: "si"; path: string };\n` +
-    `export type Brand = LogoBrand | SiBrand;\n\n` +
+    `export type MonoBrand = { kind: "mono"; body: string; viewBox: string };\n` +
+    `export type TileBrand = { kind: "tile"; color: string };\n` +
+    `export type Brand = LogoBrand | MonoBrand | TileBrand;\n\n` +
     `export const brandPaths: Record<string, Brand> = ${JSON.stringify(
       result,
       null,
@@ -581,21 +689,20 @@ const intLines = integrations
 
 fs.writeFileSync(
   path.join(outDir, "integrations.ts"),
-  `export type Integration = {\n  name: string;\n  category: string;\n  hint: string;\n  // Lookup key into brandPaths. null → letter monogram fallback.\n  key: string | null;\n};\n\n// Ordered by popularity — pinned brands come first, long tail after.\nexport const integrations: Integration[] = [\n${intLines}\n];\n`,
+  `export type Integration = {\n  name: string;\n  category: string;\n  hint: string;\n  key: string | null;\n};\n\n// Ordered by popularity — pinned brands come first, long tail after.\nexport const integrations: Integration[] = [\n${intLines}\n];\n`,
 );
 
 console.log(
-  "Wrote",
   Object.keys(result).length,
-  "icons /",
+  "icon entries /",
   integrations.length,
   "integrations.",
 );
 console.log(
   "Coverage:",
   integrations.filter((i) => i.key).length,
-  "with logo,",
+  "with brand mark,",
   misses.length,
-  "monogram fallback.",
+  "uncovered.",
 );
-if (misses.length) console.log("Monograms:", misses.join(", "));
+if (misses.length) console.log("Uncovered:", misses.join(", "));

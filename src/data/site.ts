@@ -4,22 +4,35 @@ export const FOOTER_BLURB =
 export const DEMO_HREF = "/demo";
 export const DEMO_LABEL = "Book a demo";
 
-export const FOOTER_LINKS = [
+export type FooterItem = { label: string; href: string };
+export type FooterColumn = { heading: string; items: readonly FooterItem[] };
+
+export const FOOTER_LINKS: readonly FooterColumn[] = [
   {
     heading: "Legal",
-    items: ["Terms of Service", "Privacy Policy"],
+    items: [
+      { label: "Terms of Service", href: "/terms" },
+      { label: "Privacy Policy", href: "/privacy" },
+    ],
   },
   {
     heading: "Compliance",
-    items: ["How We Handle Data"],
+    items: [{ label: "How We Handle Data", href: "/data-privacy" }],
   },
   {
     heading: "Company",
-    items: ["Enterprise", "Blog"],
+    items: [
+      { label: "Research", href: "/research" },
+      { label: "Manifesto", href: "/manifesto" },
+      { label: "Blog", href: "/blog" },
+    ],
   },
   {
     heading: "Preferences",
-    items: ["Cookie Settings", "Do Not Sell or Share My Personal Information"],
+    items: [
+      { label: "Cookie Settings", href: "#" },
+      { label: "Do Not Sell or Share My Personal Information", href: "#" },
+    ],
   },
 ] as const;
 

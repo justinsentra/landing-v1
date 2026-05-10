@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   FOOTER_COPYRIGHT,
   FOOTER_LINKS,
@@ -11,11 +12,17 @@ export function SiteFooter() {
         {FOOTER_LINKS.map((col) => (
           <div key={col.heading}>
             <h5>{col.heading}</h5>
-            {col.items.map((item) => (
-              <a key={item} href="#">
-                {item}
-              </a>
-            ))}
+            {col.items.map((item) =>
+              item.href.startsWith("#") ? (
+                <a key={item.label} href={item.href}>
+                  {item.label}
+                </a>
+              ) : (
+                <Link key={item.label} href={item.href}>
+                  {item.label}
+                </Link>
+              ),
+            )}
           </div>
         ))}
       </div>

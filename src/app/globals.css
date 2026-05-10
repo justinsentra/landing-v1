@@ -20,13 +20,14 @@
   --mono-ink: #525252;
   --hero-ink: #06070a;
 
-  /* Ink-on-dark scale */
-  --ink-d-strong: rgba(239, 241, 244, 0.92);
+  /* Ink-on-dark scale — alpha steps of #eff1f4 used everywhere a dark
+     surface (hero, final CTA) needs ink that won't blow out highlights. */
+  --ink-d-strong: rgba(239, 241, 244, 0.96);
   --ink-d-body: rgba(239, 241, 244, 0.78);
   --ink-d-muted: rgba(239, 241, 244, 0.55);
   --ink-d-faint: rgba(239, 241, 244, 0.45);
-  --ink-d-edge: rgba(239, 241, 244, 0.22);
-  --ink-d-hush: rgba(239, 241, 244, 0.16);
+  --ink-d-edge: rgba(239, 241, 244, 0.32);
+  --ink-d-hush: rgba(239, 241, 244, 0.2);
 
   /* Glass scale */
   --glass-xs: rgba(255, 255, 255, 0.08);
@@ -35,7 +36,7 @@
   --glass-lg: rgba(255, 255, 255, 0.34);
 
   /* Type */
-  --sans: var(--font-geist), "Inter", system-ui, sans-serif;
+  --sans: var(--font-geist-sans), "Inter", system-ui, sans-serif;
   --mono: var(--font-geist-mono), "JetBrains Mono", Menlo, monospace;
 
   /* Layout */
@@ -43,6 +44,16 @@
   --gutter: 32px;
   --box-pad: 32px;
   --radius-pill: 999px;
+
+  /* Section rhythm — canonical vertical padding scale.
+     Use these tokens, not raw px, on every section root. */
+  --section-major: 96px; /* major content sections */
+  --section-sub: 64px; /* sub-sections, transitions, between blocks */
+  --section-inline: 48px; /* inline boxes, ASCII blocks, axiom strips */
+  --section-top: 192px; /* subpage first section under fixed nav (drops well below nav) */
+  --section-top-sm: 128px; /* subpage page top on narrow viewports */
+  --section-top-final: 128px; /* final-CTA hero top padding (used on home + subpages) */
+  --section-top-final-sm: 96px; /* final-CTA hero top on narrow viewports */
 
   /* Motion */
   --dur-fast: 180ms;
@@ -52,38 +63,61 @@
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-curtain: cubic-bezier(0.45, 0.05, 0.55, 0.95);
   --ease-shimmer: cubic-bezier(0.4, 0, 0.6, 1);
+
+  /* ── Token aliases (bridge to central landing's @theme names) ──
+     Lets components reference shared token names without rebinding
+     when migrated. Keep both names live during the transition. */
+  --color-foreground: var(--fg);
+  --color-background: var(--bg);
+  --color-brand: var(--primary);
+  --color-brand-hover: var(--primary-deep);
+  --color-muted: var(--muted);
+  --color-border: var(--hairline-subtle);
 }
 
-* {
+/* ──────────────────────────────────────────────────────────────────
+   Scoped resets & element styles.
+   Everything below applies only inside `.cb-root` so this stylesheet
+   can be imported alongside central's Tailwind tokens without
+   nuking borders, spacing, or `.container` globally.
+
+   This site adds `cb-root` to <body> in layout.tsx; when migrating a
+   page into central, wrap it in <div className="cb-root">.
+   ────────────────────────────────────────────────────────────────── */
+.cb-root,
+.cb-root * {
   box-sizing: border-box;
   border-radius: 0 !important;
   margin: 0;
   padding: 0;
 }
-html,
-body {
+.cb-root {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
-}
-body {
   font-size: 16px;
   line-height: 1.6;
   letter-spacing: -0.01em;
 }
-a {
+/* Zero-specificity baseline reset. `:where()` keeps these from overriding
+   any explicit anchor color rules elsewhere (.nav-link, .nav-cta,
+   .nav-brand, etc.) which use color-mix() driven by --nav-mix. Without
+   :where(), `.cb-root a` (0,1,1) silently beat `.nav-link` (0,1,0) and
+   pinned the nav text to the inherited body ink, breaking the scroll
+   transition. */
+:where(.cb-root) a {
   color: inherit;
   text-decoration: none;
 }
-button {
+:where(.cb-root) button {
   font: inherit;
   color: inherit;
   background: none;
   border: none;
   cursor: pointer;
 }
-.container {
+.cb-root .container {
   width: min(calc(100% - 2 * var(--gutter)), var(--container));
   margin: 0 auto;
 }
@@ -156,7 +190,7 @@ button {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   justify-self: end;
 }
 .nav-link {
@@ -167,11 +201,8 @@ button {
   padding: 8px 4px;
   position: relative;
   white-space: nowrap;
-  color: color-mix(
-    in oklab,
-    rgba(239, 241, 244, 0.92),
-    rgba(14, 14, 18, 0.82) calc(var(--nav-mix, 0) * 100%)
-  );
+  color: color-mix(in oklab, #eff1f4, #0e0e12 calc(var(--nav-mix, 0) * 100%));
+  transition: color var(--dur-fast) var(--ease);
 }
 .nav-link:hover::after {
   content: "";
@@ -185,18 +216,18 @@ button {
 .nav-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .wordmark {
   font-weight: 600;
   letter-spacing: -0.04em;
   font-family: var(--sans);
-  font-size: 17px;
-  color: color-mix(
-    in oklab,
-    rgba(239, 241, 244, 0.92),
-    #0e0e12 calc(var(--nav-mix, 0) * 100%)
-  );
+  font-size: 18px;
+  /* Fully-opaque endpoints. Mixing through translucent colors makes the
+     result semi-transparent and renders darker than expected on light
+     surfaces. #eff1f4 is the perceptual color of --ink-d-strong on dark. */
+  color: color-mix(in oklab, #eff1f4, #0e0e12 calc(var(--nav-mix, 0) * 100%));
+  transition: color var(--dur-fast) var(--ease);
 }
 .nav .brand-mark {
   display: block;
@@ -205,13 +236,14 @@ button {
   color: color-mix(in oklab, #ffffff, #0e0e12 calc(var(--nav-mix, 0) * 100%));
 }
 .nav-cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 38px;
   padding: 0 16px;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: -0.005em;
   border-radius: 999px;
@@ -245,6 +277,20 @@ button {
 .nav-cta:hover {
   filter: brightness(1.08);
 }
+/* Hit-area extension — keeps the visible chip at 38px while the
+   tappable region reaches the 40×40 minimum (DESIGN.md §10).
+   Uses ::before because .nav-link::after is reserved for the hover
+   underline. ::before paints below text (default paint order), so
+   the transparent rectangle catches clicks without occluding anything. */
+.nav-cta::before,
+.nav-link::before {
+  content: "";
+  position: absolute;
+  inset: -4px -2px;
+}
+.nav-link {
+  position: relative;
+}
 
 /* ───────── HERO ───────── */
 .hero {
@@ -255,6 +301,11 @@ button {
   color: #eff1f4;
   overflow: hidden;
   isolation: isolate;
+  /* Note: previously had `content-visibility: auto` for paint pause when
+     offscreen, but it created a containing-block side effect that made
+     the fixed `.nav-wrap` disappear during scroll. Removed in favor of
+     keeping the nav visible. The hero curtains/shimmer keep painting while
+     offscreen — measurable cost is small for a single section above the fold. */
 }
 .hero-base {
   position: absolute;
@@ -280,7 +331,10 @@ button {
       rgba(6, 7, 10, 0.55) 100%
     );
 }
-.hero-curtain {
+/* Shared curtain/shimmer atmosphere: hero (also reused by agents variant)
+   and final-CTA. Identical recipe; merged to keep them in lockstep. */
+.hero-curtain,
+.final-curtain {
   position: absolute;
   inset: -15% -10%;
   z-index: 0;
@@ -305,7 +359,8 @@ button {
   animation: curtainA 22s var(--ease-curtain) infinite alternate;
   will-change: transform;
 }
-.hero-curtain.b {
+.hero-curtain.b,
+.final-curtain.b {
   filter: blur(80px);
   background:
     radial-gradient(
@@ -327,7 +382,8 @@ button {
   mix-blend-mode: screen;
   opacity: 0.9;
 }
-.hero-shimmer {
+.hero-shimmer,
+.final-shimmer {
   position: absolute;
   inset: -20% -15%;
   z-index: 0;
@@ -464,8 +520,8 @@ button {
   flex-direction: column;
   width: min(calc(100% - 2 * var(--gutter)), var(--container));
   margin: 0 auto;
-  padding-top: 140px;
-  padding-bottom: 56px;
+  padding-top: 128px;
+  padding-bottom: 64px;
 }
 .hero-frame {
   flex: 1;
@@ -486,7 +542,7 @@ button {
 .headline {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(40px, 5.4vw, 76px);
+  font-size: clamp(40px, 5.4vw, 80px);
   line-height: 1.02;
   letter-spacing: -0.03em;
   color: #ffffff;
@@ -494,9 +550,9 @@ button {
   max-width: 18ch;
 }
 .lede {
-  margin-top: 22px;
+  margin-top: 24px;
   font-family: var(--sans);
-  font-size: 15.5px;
+  font-size: 16px;
   line-height: 1.55;
   letter-spacing: -0.005em;
   color: rgba(239, 241, 244, 0.82);
@@ -507,13 +563,13 @@ button {
   margin-top: 32px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   height: 44px;
   padding: 0 22px;
   font-family: var(--sans);
@@ -554,14 +610,14 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   padding-top: 24px;
 }
 .hero-backed-label {
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.005em;
-  color: rgba(239, 241, 244, 0.55);
+  color: var(--ink-d-muted);
 }
 .hero-backed-logos {
   display: flex;
@@ -586,37 +642,23 @@ button {
   }
 }
 
-/* ───────── SHARED SECTION CHROME ───────── */
+/* ───────── SHARED SECTION CHROME ─────────
+   Sections own only their TOP padding. The bottom edge belongs to the next
+   section's top — never compound. This keeps every heading optically centered:
+   gap above heading (= prev section's content edge → this heading) equals gap
+   below heading (this heading-group → grid) at exactly 96px. */
 .section {
-  padding: 48px 0;
+  padding: var(--section-major) 0 0;
   position: relative;
   overflow: hidden;
 }
 .section--first {
-  padding-top: 144px;
+  padding-top: var(--section-top);
 }
 @media (max-width: 760px) {
   .section--first {
-    padding-top: 112px;
+    padding-top: var(--section-top-sm);
   }
-}
-.section:has(+ #agents) {
-  padding-bottom: 0;
-}
-/* Apps sits directly under the dark Agents section — give the heading
-   enough breathing room above to balance the 96px gap to apps-grid below. */
-.section#apps {
-  padding-top: 96px;
-}
-/* Security heading was reading low between the apps-grid bleed-bottom and the
-   sec-grid bleed-top because the heading group is much taller than the sub.
-   Trim the section's own padding-top and bump the sec-grid margin-top so the
-   group's optical center lines up with the geometric center of the gap. */
-.section#security {
-  padding-top: 24px;
-}
-.section#security .sec-grid {
-  margin-top: 120px;
 }
 
 /* Full-bleed dashed line on the top/bottom of a contained box.
@@ -656,8 +698,9 @@ button {
   align-items: center;
   gap: 24px;
   border: 1px dashed var(--hairline-default);
-  padding: 14px 18px;
+  padding: 16px 16px;
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
@@ -675,7 +718,7 @@ button {
 .sec-h {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(40px, 5vw, 68px);
+  font-size: clamp(40px, 5vw, 56px);
   line-height: 1.04;
   letter-spacing: -0.028em;
   margin-top: 0;
@@ -683,26 +726,28 @@ button {
   text-wrap: balance;
 }
 .sec-sub {
-  margin-top: 20px;
+  margin-top: 24px;
   font-size: 18px;
   color: var(--muted);
   max-width: 62ch;
   line-height: 1.55;
+  text-wrap: pretty;
 }
 
 /* ───────── 01 · CHIEF OF STAFF ───────── */
 .cos-grid {
-  margin-top: 96px;
+  margin-top: var(--section-major);
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
   border: 1px dashed var(--hairline-default);
 }
 .cos-cell {
-  padding: var(--box-pad);
+  padding: calc(var(--box-pad) - 8px) var(--box-pad);
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  min-height: 420px;
+  gap: 16px;
+  height: 512px;
   border-left: 1px dashed var(--hairline-default);
 }
 .cos-cell:nth-child(odd) {
@@ -717,17 +762,18 @@ button {
   }
   .cos-cell {
     border-left: none;
-    min-height: auto;
+    height: auto;
+    min-height: 420px;
   }
   .cos-cell + .cos-cell {
     border-top: 1px dashed var(--hairline-default);
   }
 }
 .cos-vis {
-  min-height: 360px;
+  height: 288px;
   background: transparent;
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
@@ -735,13 +781,22 @@ button {
 .cos-vis svg,
 .cos-vis img {
   width: 100%;
-  min-height: 360px;
-  object-fit: cover;
+  height: 288px;
+  object-fit: contain;
+  object-position: center;
   display: block;
   mix-blend-mode: multiply;
 }
+.cos-cell:nth-child(3) .cos-vis img,
+.cos-cell:nth-child(3) .cos-vis svg,
+.cos-cell:nth-child(4) .cos-vis img,
+.cos-cell:nth-child(4) .cos-vis svg {
+  transform: scale(0.8);
+  transform-origin: center;
+}
 .cos-cell .label {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
@@ -751,19 +806,25 @@ button {
 .cos-cell h3 {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(22px, 2.2vw, 28px);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  text-wrap: balance;
+  font-size: clamp(18px, 1.55vw, 24px);
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .cos-cell h3 {
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 .cos-cell p {
-  font-size: 15.5px;
+  font-size: 16px;
   color: var(--muted);
   line-height: 1.55;
 }
 
 .triad-recap {
-  margin-top: 96px;
+  margin-top: var(--section-major);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border: 1px dashed var(--hairline-default);
@@ -780,6 +841,7 @@ button {
 }
 .triad-recap .lab {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
@@ -793,7 +855,7 @@ button {
   letter-spacing: -0.012em;
 }
 .triad-recap p {
-  font-size: 14.5px;
+  font-size: 14px;
   color: var(--muted);
   line-height: 1.5;
 }
@@ -812,7 +874,7 @@ button {
 
 /* ───────── 02 · DIFFERENT ───────── */
 .diff-rows {
-  margin-top: 96px;
+  margin-top: var(--section-major);
   border: 1px dashed var(--hairline-default);
 }
 .diff-row {
@@ -852,7 +914,7 @@ button {
 .diff-q h4 {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.2;
   letter-spacing: -0.018em;
   color: var(--fg);
@@ -863,7 +925,7 @@ button {
   padding: calc(var(--box-pad) + 4px) var(--box-pad) var(--box-pad);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   justify-content: flex-start;
   border-right: 1px dashed var(--hairline-default);
 }
@@ -874,8 +936,8 @@ button {
   transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 4px 10px;
+  gap: 8px;
+  padding: 4px 12px;
   background: var(--bg);
   border: 1px dashed var(--hairline-strong);
   font-family: var(--sans);
@@ -898,7 +960,7 @@ button {
 .diff-cell-text {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 .diff-vis {
   margin-top: auto;
@@ -931,7 +993,7 @@ button {
   }
 }
 .diff-cell p {
-  font-size: 15.5px;
+  font-size: 16px;
   line-height: 1.55;
   color: var(--muted);
   max-width: 46ch;
@@ -974,8 +1036,8 @@ button {
   pointer-events: none;
   background-image: linear-gradient(
     90deg,
-    rgba(239, 241, 244, 0.22) 0,
-    rgba(239, 241, 244, 0.22) 4px,
+    var(--ink-d-edge) 0,
+    var(--ink-d-edge) 4px,
     transparent 4px,
     transparent 10px
   );
@@ -996,18 +1058,24 @@ button {
   display: grid;
   grid-template-columns: 1fr 1.15fr;
   gap: 64px;
-  align-items: center;
-  padding: 80px 0;
+  align-items: stretch;
+  padding: var(--section-major) 0; /* internal-block: dark zone wraps content with symmetric breathing on both sides of the dark→light boundary */
+}
+.agents-grid > div:first-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 @media (max-width: 900px) {
   .agents-grid {
     grid-template-columns: 1fr;
-    gap: 36px;
-    padding: 56px 0;
+    gap: 32px;
+    padding: var(--section-sub) 0; /* internal-block: see desktop rule */
   }
 }
 .agents .lab {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
@@ -1015,10 +1083,10 @@ button {
   font-weight: 500;
 }
 .agents h2 {
-  margin-top: 18px;
+  margin-top: 16px;
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(36px, 4.6vw, 60px);
+  font-size: clamp(40px, 4.6vw, 56px);
   line-height: 1.04;
   letter-spacing: -0.028em;
   color: #fff;
@@ -1027,23 +1095,25 @@ button {
 }
 .agents p {
   margin-top: 24px;
-  color: rgba(239, 241, 244, 0.78);
+  color: var(--ink-d-body);
   font-size: 18px;
   line-height: 1.55;
   max-width: 52ch;
+  text-wrap: pretty;
 }
 .agents .runs-on {
-  margin-top: 36px;
+  margin-top: 32px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 .agents .runs-on .lab2 {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
-  color: rgba(239, 241, 244, 0.55);
+  color: var(--ink-d-muted);
   font-weight: 500;
 }
 .agents .runs-list {
@@ -1057,15 +1127,15 @@ button {
   align-items: center;
   gap: 8px;
   font-family: var(--sans);
-  font-size: 14.5px;
+  font-size: 14px;
   letter-spacing: -0.005em;
-  color: rgba(239, 241, 244, 0.92);
+  color: var(--ink-d-strong);
 }
 .agents .runs-list .brand-mark {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  color: rgba(239, 241, 244, 0.92);
+  color: var(--ink-d-strong);
   transition:
     color 180ms ease,
     transform 180ms ease;
@@ -1079,7 +1149,7 @@ button {
   height: 38px;
   padding: 0 18px;
   align-self: flex-start;
-  margin-top: 4px;
+  margin-top: 20px;
 }
 
 .code-window {
@@ -1087,7 +1157,7 @@ button {
   background: rgba(14, 16, 20, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px dashed rgba(239, 241, 244, 0.32);
+  border: 1px solid var(--ink-d-edge);
   box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
 }
 .code-bar {
@@ -1095,21 +1165,23 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px dashed rgba(239, 241, 244, 0.22);
+  border-bottom: 1px solid var(--ink-d-edge);
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
-  color: rgba(239, 241, 244, 0.55);
+  color: var(--ink-d-muted);
 }
 .code-bar .dots {
   display: inline-flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 .code-bar .dots i {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   display: inline-block;
+  border-radius: 50%;
   background: #3a3a3a;
 }
 .code-bar .dots i:nth-child(1) {
@@ -1122,12 +1194,13 @@ button {
   background: #27c93f;
 }
 .code-bar .file {
-  color: rgba(239, 241, 244, 0.78);
+  color: var(--ink-d-body);
 }
 .code {
-  padding: 24px 22px;
+  padding: 24px 24px;
   font-family: var(--mono);
-  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
   line-height: 1.7;
   color: #eff1f4;
   white-space: pre;
@@ -1146,7 +1219,7 @@ button {
   color: #79d9a1;
 }
 .tk-com {
-  color: rgba(239, 241, 244, 0.45);
+  color: var(--ink-d-faint);
 }
 .tk-bool {
   color: #ffb66e;
@@ -1156,11 +1229,12 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-top: 1px dashed rgba(239, 241, 244, 0.22);
+  border-top: 1px solid var(--ink-d-edge);
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
-  color: rgba(239, 241, 244, 0.55);
+  color: var(--ink-d-muted);
 }
 .code-foot .ok {
   color: #79d9a1;
@@ -1174,7 +1248,7 @@ button {
 .pipe-head h2 {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(40px, 5vw, 68px);
+  font-size: clamp(40px, 5vw, 56px);
   line-height: 1.04;
   letter-spacing: -0.028em;
   text-wrap: balance;
@@ -1182,7 +1256,7 @@ button {
   margin-top: 0;
 }
 .pipe-head p {
-  margin-top: 18px;
+  margin-top: 16px;
   font-size: 18px;
   color: var(--muted);
   line-height: 1.55;
@@ -1268,12 +1342,13 @@ button {
 .pipe-item-head {
   display: grid;
   grid-template-columns: auto auto 1fr auto;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
   user-select: none;
 }
 .pipe-item .num {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   color: var(--mono-ink);
@@ -1290,7 +1365,7 @@ button {
 .pipe-item h4 {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: -0.014em;
 }
 .pipe-item.is-open h4 {
@@ -1298,6 +1373,7 @@ button {
 }
 .pipe-item .chev {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 14px;
   color: var(--muted);
   transition: transform 220ms var(--ease);
@@ -1320,7 +1396,7 @@ button {
 }
 .pipe-body p {
   padding: 18px 0 4px 36px;
-  font-size: 15.5px;
+  font-size: 16px;
   color: var(--muted);
   line-height: 1.6;
   max-width: 54ch;
@@ -1328,9 +1404,10 @@ button {
 .pipe-body .meta {
   padding: 14px 0 4px 36px;
   display: flex;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
@@ -1411,7 +1488,7 @@ section#apps {
   padding-bottom: 0;
 }
 .apps-grid {
-  margin-top: 96px;
+  margin-top: var(--section-major);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border: 1px dashed var(--hairline-default);
@@ -1431,7 +1508,7 @@ section#apps {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   padding: 22px var(--box-pad);
   border-right: 1px dashed var(--hairline-default);
   border-bottom: 1px dashed var(--hairline-default);
@@ -1495,22 +1572,16 @@ section#apps {
   height: 22px;
   display: inline-block;
   background: var(--logo) center / contain no-repeat;
-  /* GPU-composited transition: filter desaturates to grey at rest,
-     animates back to full color on hover. No mask → no per-frame repaint. */
-  filter: grayscale(1) brightness(0.6) contrast(0.95);
-  transition:
-    filter 220ms var(--ease),
-    transform 260ms var(--ease);
+  /* Full color at rest. Hover bumps scale only. */
+  transition: transform 260ms var(--ease);
   flex-shrink: 0;
-  will-change: filter;
 }
 .apps-grid .row:hover .ic {
-  filter: none;
   transform: scale(1.08);
 }
 .apps-grid .row .nm {
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   letter-spacing: -0.005em;
   color: var(--fg);
   transition: color 260ms ease;
@@ -1520,11 +1591,15 @@ section#apps {
 }
 .apps-grid .row .cat {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
   color: var(--mono-ink);
   font-weight: 500;
+  white-space: nowrap;
+  text-align: right;
+  justify-self: end;
 }
 .apps-foot {
   margin-top: 24px;
@@ -1537,7 +1612,7 @@ section#apps {
 }
 .apps-foot-note {
   font-family: var(--sans);
-  font-size: 14.5px;
+  font-size: 14px;
   letter-spacing: -0.005em;
   color: var(--mono-ink);
   margin: 0;
@@ -1545,9 +1620,9 @@ section#apps {
 .apps-foot-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: -0.005em;
   color: var(--fg);
@@ -1610,7 +1685,7 @@ section#apps {
   display: inline-flex;
   align-items: center;
   flex: 1 1 320px;
-  min-width: 240px;
+  min-width: 288px;
   height: 44px;
   padding: 0 16px 0 40px;
   background: #fff;
@@ -1680,15 +1755,34 @@ section#apps {
 .int-cell {
   position: relative;
   padding: 22px var(--box-pad) 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  /* 2-col grid: logo spans both rows so it optically centers against the
+     name + hint block, not just the title row. */
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  column-gap: 14px;
+  row-gap: 6px;
+  align-items: center;
   border-right: 1px dashed var(--hairline-default);
   border-bottom: 1px dashed var(--hairline-default);
   transition: background-color 220ms ease;
 }
+/* Author-level `display: grid` defeats UA `[hidden] { display: none }`. */
+.int-cell[hidden] {
+  display: none;
+}
 .int-cell:hover {
   background-color: rgba(14, 14, 18, 0.02);
+}
+.int-cell > .int-ic {
+  grid-row: 1 / 3;
+  align-self: center;
+}
+.int-cell-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
 }
 .int-grid .int-cell:nth-child(3n) {
   border-right: 0;
@@ -1719,12 +1813,6 @@ section#apps {
     border-bottom: 0;
   }
 }
-.int-cell-head {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-}
 .int-ic {
   width: 28px;
   height: 28px;
@@ -1733,32 +1821,38 @@ section#apps {
   justify-content: center;
   flex-shrink: 0;
 }
-.int-ic svg {
+.int-ic svg,
+.int-ic .brand-img {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: contain;
 }
 .int-name {
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   letter-spacing: -0.005em;
   color: var(--fg);
   font-weight: 500;
 }
 .int-cat {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
   letter-spacing: 0;
   color: var(--mono-ink);
-  padding: 3px 8px;
+  padding: 4px 8px;
   border: 1px solid var(--hairline-subtle);
   background: var(--surface);
   white-space: nowrap;
 }
 .int-hint {
-  margin: 4px 0 0 40px;
+  /* Lives in grid column 2 — alignment with the name comes from the parent
+     grid, not a hardcoded left margin. */
+  grid-column: 2;
+  margin: 0;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.5;
   letter-spacing: -0.005em;
   color: var(--muted);
@@ -1769,10 +1863,11 @@ section#apps {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 .int-count {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   color: var(--mono-ink);
@@ -1802,11 +1897,24 @@ section#apps {
   background: var(--fg);
   color: #fafbfc;
 }
+/* Hit-area extension on integration controls (DESIGN.md §10). */
+.int-pill,
+.int-category,
+.int-more {
+  position: relative;
+}
+.int-pill::before,
+.int-category::before,
+.int-more::before {
+  content: "";
+  position: absolute;
+  inset: -8px -4px;
+}
 .int-empty {
-  padding: 64px 0;
+  padding: var(--section-sub) 0; /* internal-block: discrete empty-state, not a section root */
   text-align: center;
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   color: var(--muted);
   border: 1px dashed var(--hairline-default);
 }
@@ -1820,7 +1928,7 @@ section#apps {
   max-width: 56ch;
 }
 .sec-grid {
-  margin-top: 96px;
+  margin-top: var(--section-major);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border: 1px dashed var(--hairline-default);
@@ -1840,7 +1948,7 @@ section#apps {
   padding: var(--box-pad);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   border-left: 1px dashed var(--hairline-default);
   min-height: 280px;
 }
@@ -1886,7 +1994,7 @@ section#apps {
 .sec-cell h4 {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: 19px;
+  font-size: 18px;
   letter-spacing: -0.014em;
   color: var(--fg);
   margin-top: 4px;
@@ -1895,49 +2003,85 @@ section#apps {
   color: var(--fg);
 }
 .sec-cell > p {
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.55;
   color: var(--muted);
   max-width: 38ch;
 }
+/* Compliance ledger — one uniform dashed strip, fused to .sec-grid above
+   via a -1px collapse so the strips share a single dashed seam (same trick
+   .mb-cell uses). Equal 1fr columns keep every badge identical in width
+   regardless of label length. */
 .sec-badges-row {
-  margin-top: 20px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  margin-top: -1px;
+  margin-bottom: 64px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border: 1px dashed var(--hairline-default);
+  background: var(--surface);
+}
+@media (max-width: 1100px) {
+  .sec-badges-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .sec-badges-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .sec-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 12px;
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   font-weight: 500;
   color: var(--mono-ink);
-  border: 1px dashed var(--hairline-default);
-  background: var(--surface);
+  border-left: 1px dashed var(--hairline-default);
+  white-space: nowrap;
   transition:
     color 180ms var(--ease),
-    border-color 180ms var(--ease),
     background 180ms var(--ease);
+}
+.sec-badge:first-child {
+  border-left: none;
+}
+@media (max-width: 1100px) {
+  .sec-badge:nth-child(3n + 1) {
+    border-left: none;
+  }
+  .sec-badge:nth-child(n + 4) {
+    border-top: 1px dashed var(--hairline-default);
+  }
+}
+@media (max-width: 600px) {
+  .sec-badge:nth-child(n) {
+    border-left: 1px dashed var(--hairline-default);
+  }
+  .sec-badge:nth-child(odd) {
+    border-left: none;
+  }
+  .sec-badge:nth-child(n + 3) {
+    border-top: 1px dashed var(--hairline-default);
+  }
 }
 .sec-badge:hover {
   color: var(--fg);
-  border-color: var(--hairline-strong);
   background: #fff;
 }
 .sec-badge svg {
   width: 12px;
   height: 12px;
   color: var(--mono-ink);
+  transition: color 180ms var(--ease);
 }
 .sec-badge:hover svg {
-  color: var(--fg);
+  color: var(--primary);
 }
 
 /* ───────── 07 · FINAL CTA + FOOTER (merged) ───────── */
@@ -1947,11 +2091,15 @@ section#apps {
   color: #eff1f4;
   overflow: hidden;
   isolation: isolate;
-  margin-top: 0;
+  /* Consistent breathing room between any page's last content block and the
+     dark final/footer band. Page bg shows through; the dotted divider on
+     `.final::before` stays pinned to the dark area's top edge. */
+  margin-top: var(--section-major);
 }
+/* .final-curtain and .final-shimmer are positioned via the shared
+   `.hero-curtain, .final-curtain` / `.hero-shimmer, .final-shimmer`
+   blocks above (identical recipe across hero + final). */
 .final-base,
-.final-curtain,
-.final-shimmer,
 .final-dots,
 .final-grain {
   position: absolute;
@@ -1992,87 +2140,12 @@ section#apps {
   pointer-events: none;
   background-image: linear-gradient(
     90deg,
-    rgba(239, 241, 244, 0.22) 0,
-    rgba(239, 241, 244, 0.22) 4px,
+    var(--ink-d-edge) 0,
+    var(--ink-d-edge) 4px,
     transparent 4px,
     transparent 10px
   );
   background-size: 10px 1px;
-}
-/* Two animated blue curtains – same recipe as Agents/Hero */
-.final-curtain {
-  z-index: 0;
-  inset: -15% -10%;
-  filter: blur(70px);
-  background:
-    radial-gradient(
-      ellipse 22% 90% at 30% 55%,
-      rgba(60, 120, 255, 0.38),
-      transparent 62%
-    ),
-    radial-gradient(
-      ellipse 26% 95% at 50% 52%,
-      rgba(90, 148, 255, 0.55),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 22% 90% at 70% 50%,
-      rgba(50, 110, 230, 0.4),
-      transparent 60%
-    );
-  animation: curtainA 22s var(--ease-curtain) infinite alternate;
-  will-change: transform;
-}
-.final-curtain.b {
-  filter: blur(80px);
-  background:
-    radial-gradient(
-      ellipse 26% 90% at 22% 48%,
-      rgba(40, 100, 230, 0.34),
-      transparent 62%
-    ),
-    radial-gradient(
-      ellipse 30% 92% at 50% 52%,
-      rgba(120, 170, 255, 0.38),
-      transparent 62%
-    ),
-    radial-gradient(
-      ellipse 24% 90% at 76% 50%,
-      rgba(50, 110, 235, 0.34),
-      transparent 62%
-    );
-  animation: curtainB 28s var(--ease-curtain) infinite alternate;
-  mix-blend-mode: screen;
-  opacity: 0.9;
-}
-.final-shimmer {
-  z-index: 0;
-  inset: -20% -15%;
-  filter: blur(40px);
-  opacity: 0.65;
-  mix-blend-mode: screen;
-  background:
-    radial-gradient(
-      ellipse 8% 60% at 18% 45%,
-      rgba(140, 190, 255, 0.45),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 10% 50% at 38% 60%,
-      rgba(160, 210, 255, 0.4),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 8% 55% at 62% 42%,
-      rgba(120, 180, 255, 0.5),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 9% 60% at 84% 58%,
-      rgba(140, 190, 255, 0.4),
-      transparent 60%
-    );
-  animation: shimmer 16s var(--ease-shimmer) infinite alternate;
 }
 .final-dots {
   z-index: 2;
@@ -2108,30 +2181,22 @@ section#apps {
   z-index: 4;
   width: min(calc(100% - 2 * var(--gutter)), var(--container));
   margin: 0 auto;
-  padding: 168px 0 56px;
+  padding: var(--section-top-final) 0 var(--section-sub);
   display: flex;
   flex-direction: column;
-}
-.pf-inner {
-  padding: 96px 0 56px;
-}
-@media (max-width: 760px) {
-  .pf-inner {
-    padding: 64px 0 40px;
-  }
 }
 .final-hero {
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
-  margin-bottom: 140px;
+  gap: 24px;
+  margin-bottom: 128px;
 }
 .final h2 {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(48px, 7.5vw, 108px);
+  font-size: clamp(56px, 7.5vw, 80px);
   line-height: 0.98;
   letter-spacing: -0.034em;
   color: #fff;
@@ -2140,25 +2205,29 @@ section#apps {
   margin: 0;
 }
 .final p {
-  color: rgba(239, 241, 244, 0.78);
+  color: var(--ink-d-body);
   font-size: 18px;
   line-height: 1.55;
   max-width: 52ch;
   margin: 0;
+  text-wrap: pretty;
 }
 .final-foot {
   position: relative;
-  padding-top: 48px;
+  padding-top: var(--section-inline);
 }
 .final-foot::before {
   display: none;
 }
 @media (max-width: 760px) {
+  .final {
+    margin-top: var(--section-sub);
+  }
   .final-inner {
-    padding: 120px 0 40px;
+    padding: var(--section-top-final-sm) 0 32px;
   }
   .final-hero {
-    margin-bottom: 80px;
+    margin-bottom: 64px;
   }
 }
 
@@ -2175,18 +2244,19 @@ section#apps {
 }
 .foot-grid h5 {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
-  color: rgba(239, 241, 244, 0.45);
+  color: var(--ink-d-faint);
   font-weight: 500;
   margin-bottom: 14px;
 }
 .foot-grid a {
   display: block;
-  font-size: 13.5px;
+  font-size: 14px;
   letter-spacing: -0.005em;
-  color: rgba(239, 241, 244, 0.78);
+  color: var(--ink-d-body);
   padding: 5px 0;
 }
 .foot-grid a:hover {
@@ -2197,10 +2267,10 @@ section#apps {
   margin-top: 48px;
   margin-bottom: 18px;
   font-family: var(--sans);
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.55;
   letter-spacing: -0.005em;
-  color: rgba(239, 241, 244, 0.55);
+  color: var(--ink-d-muted);
   max-width: none;
 }
 .foot-bot {
@@ -2210,11 +2280,11 @@ section#apps {
   justify-content: flex-start;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 6px 18px;
+  gap: 8px 16px;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: -0.005em;
-  color: rgba(239, 241, 244, 0.45);
+  color: var(--ink-d-faint);
 }
 .foot-bot::before {
   content: "";
@@ -2227,8 +2297,8 @@ section#apps {
   pointer-events: none;
   background-image: linear-gradient(
     90deg,
-    rgba(239, 241, 244, 0.32) 0,
-    rgba(239, 241, 244, 0.32) 2px,
+    var(--ink-d-edge) 0,
+    var(--ink-d-edge) 2px,
     transparent 2px,
     transparent 5px
   );
@@ -2245,7 +2315,7 @@ section#apps {
 /* ───────── 06 · FUNCTIONS ───────── */
 .fn-section {
   position: relative;
-  padding: 96px 0 96px;
+  padding: var(--section-major) 0 0;
   background: var(--bg);
 }
 
@@ -2259,7 +2329,7 @@ section#apps {
    cards stay container-bound without any clipping at this level. */
 .fn-rail-frame {
   position: relative;
-  margin-top: 56px;
+  margin-top: var(--section-sub);
   padding: 0;
   /* Dashed verticals on the container's left/right edges. They stay
      pinned to the container width regardless of how far the rail has
@@ -2314,9 +2384,10 @@ section#apps {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 16px 22px;
+  padding: 16px 24px;
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
   letter-spacing: 0;
   color: var(--mono-ink);
 }
@@ -2329,13 +2400,13 @@ section#apps {
 }
 
 .fn-card-body {
-  padding: 16px 26px 28px;
+  padding: 16px 24px 32px;
   display: flex;
   flex-direction: column;
   /* Unified vertical rhythm: every adjacent pair of body children
      (question, divider, reply, each source row) is separated by the
      same 14px gap. Source-row gap is matched to this value below. */
-  gap: 14px;
+  gap: 16px;
   flex: 1;
 }
 
@@ -2346,7 +2417,7 @@ section#apps {
 .fn-question {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.22;
   letter-spacing: -0.018em;
   color: var(--fg);
@@ -2362,10 +2433,10 @@ section#apps {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   /* Generous breathing room above and below the divider so the question
      above and the reply / sources below feel set apart from the mark. */
-  margin-top: 18px;
+  margin-top: 16px;
   margin-bottom: 26px;
 }
 
@@ -2383,7 +2454,7 @@ section#apps {
 
 .fn-reply {
   font-family: var(--sans);
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.55;
   color: var(--fg);
   letter-spacing: -0.005em;
@@ -2401,7 +2472,7 @@ section#apps {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .fn-source {
@@ -2421,8 +2492,7 @@ section#apps {
   display: inline-block;
   width: 18px;
   height: 18px;
-  /* Optical centering against first text line (13px × 1.45 ≈ 19px). */
-  margin-top: 1px;
+  margin-top: 1px; /* optical: centers against first text line (14×1.45 ≈ 20px) */
   background: var(--logo) center / contain no-repeat;
   filter: grayscale(1) brightness(0.6) contrast(0.95);
   opacity: 0.7;
@@ -2439,7 +2509,7 @@ section#apps {
 
 .fn-source-text {
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.45;
   color: var(--mono-ink);
   letter-spacing: -0.003em;
@@ -2447,7 +2517,7 @@ section#apps {
 
 @media (max-width: 760px) {
   .fn-section {
-    padding: 64px 0;
+    padding: var(--section-sub) 0 0;
   }
   .fn-card {
     flex: 0 0 84vw;
@@ -2459,27 +2529,27 @@ section#apps {
    DEMO PAGE
    ────────────────────────────────────────────────────────────────────────── */
 .demo-grid {
-  margin-top: 56px;
+  margin-top: var(--section-sub);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 96px;
+  gap: var(--section-major);
   align-items: start;
 }
 @media (max-width: 980px) {
   .demo-grid {
     grid-template-columns: 1fr;
-    gap: 56px;
+    gap: var(--section-sub);
   }
 }
 .demo-quote {
-  margin-top: 56px;
-  padding-top: 28px;
+  margin-top: var(--section-sub);
+  padding-top: 32px;
   border-top: 1px dashed var(--hairline-default);
   max-width: 48ch;
 }
 .demo-quote blockquote {
   font-family: var(--sans);
-  font-size: clamp(20px, 1.8vw, 24px);
+  font-size: clamp(18px, 1.8vw, 24px);
   line-height: 1.4;
   letter-spacing: -0.012em;
   color: var(--fg);
@@ -2487,15 +2557,15 @@ section#apps {
   font-style: normal;
 }
 .demo-quote figcaption {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 .demo-quote-attr {
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--fg);
 }
@@ -2509,15 +2579,15 @@ section#apps {
 .demo-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   border: 1px dashed var(--hairline-default);
-  padding: 36px;
+  padding: 32px;
   background: var(--surface);
 }
 .demo-row-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 16px;
 }
 @media (max-width: 600px) {
   .demo-row-2 {
@@ -2531,7 +2601,7 @@ section#apps {
 }
 .demo-field label {
   font-family: var(--sans);
-  font-size: 13.5px;
+  font-size: 14px;
   letter-spacing: -0.005em;
   color: var(--fg);
   font-weight: 500;
@@ -2540,12 +2610,12 @@ section#apps {
 .demo-field select,
 .demo-field textarea {
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   letter-spacing: -0.005em;
   color: var(--fg);
   background: #fff;
   border: 1px solid var(--hairline-default);
-  padding: 12px 14px;
+  padding: 12px 16px;
   outline: none;
   width: 100%;
   transition:
@@ -2586,14 +2656,14 @@ section#apps {
   color: var(--fg);
 }
 .demo-submit {
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 52px;
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.005em;
   color: #fff;
@@ -2607,7 +2677,7 @@ section#apps {
 }
 .demo-form-done {
   align-items: flex-start;
-  padding: 56px 36px;
+  padding: 64px 32px;
 }
 .demo-form-done h3 {
   font-family: var(--sans);
@@ -2618,7 +2688,7 @@ section#apps {
 }
 .demo-form-done p {
   margin-top: 8px;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.55;
   color: var(--muted);
   max-width: 40ch;
@@ -2629,6 +2699,7 @@ section#apps {
    ────────────────────────────────────────────────────────────────────────── */
 .rh-eyebrow {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   letter-spacing: 0;
   color: var(--mono-ink);
@@ -2639,7 +2710,7 @@ section#apps {
 .rh-display {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(36px, 4.6vw, 60px);
+  font-size: clamp(40px, 4.6vw, 56px);
   line-height: 1.08;
   letter-spacing: -0.028em;
   color: var(--fg);
@@ -2648,7 +2719,7 @@ section#apps {
 }
 .rh-lede {
   margin-top: 24px;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.6;
   color: var(--muted);
   max-width: 64ch;
@@ -2658,14 +2729,15 @@ section#apps {
   margin-top: 16px;
 }
 .rt-block {
-  margin-top: 56px;
-  padding: 48px 0 56px;
+  margin-top: var(--section-sub);
+  padding: var(--section-inline) 0 var(--section-sub);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 .rt-eyebrow {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   letter-spacing: 0;
   color: var(--primary);
@@ -2674,7 +2746,7 @@ section#apps {
 .rt-h {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(28px, 3.2vw, 40px);
+  font-size: clamp(32px, 3.2vw, 40px);
   line-height: 1.12;
   letter-spacing: -0.026em;
   color: var(--fg);
@@ -2693,7 +2765,7 @@ section#apps {
 }
 
 .ra-stack {
-  margin-top: 64px;
+  margin-top: var(--section-sub);
   border: 1px dashed var(--hairline-default);
 }
 .ra-act {
@@ -2710,6 +2782,7 @@ section#apps {
 }
 .ra-act-num {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -2742,7 +2815,7 @@ section#apps {
   margin-bottom: 14px;
 }
 .ra-p {
-  font-size: 15.5px;
+  font-size: 16px;
   line-height: 1.65;
   color: var(--muted);
   max-width: 72ch;
@@ -2752,11 +2825,11 @@ section#apps {
 }
 
 .rp-h {
-  margin-top: 96px;
+  margin-top: var(--section-major);
   margin-bottom: 24px;
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(32px, 3vw, 40px);
   line-height: 1.1;
   letter-spacing: -0.026em;
   color: var(--fg);
@@ -2787,7 +2860,7 @@ section#apps {
 .rp-row-main {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
 }
 .rp-title {
@@ -2808,7 +2881,7 @@ section#apps {
 .rp-venue {
   font-family: var(--sans);
   font-style: italic;
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--mono-ink);
 }
@@ -2831,18 +2904,18 @@ section#apps {
   font-weight: 500;
 }
 .mb-subtitle {
-  margin-top: 14px;
+  margin-top: 16px;
   font-family: var(--sans);
-  font-size: 22px;
+  font-size: 24px;
   letter-spacing: -0.018em;
   color: var(--muted);
 }
 .mb-thesis {
-  margin-top: 56px;
-  padding: 56px 0;
+  margin-top: var(--section-sub);
+  padding: var(--section-sub) 0; /* internal-block: discrete pull-quote with its own framing */
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(22px, 2.4vw, 28px);
+  font-size: clamp(24px, 2.4vw, 32px);
   line-height: 1.32;
   letter-spacing: -0.018em;
   color: var(--fg);
@@ -2850,12 +2923,12 @@ section#apps {
   text-wrap: pretty;
 }
 .mb-stack {
-  margin-top: 56px;
+  margin-top: var(--section-sub);
   display: flex;
   flex-direction: column;
 }
 .mb-cell {
-  padding: 48px var(--box-pad);
+  padding: var(--section-inline) var(--box-pad);
   border: 1px dashed var(--hairline-default);
   display: flex;
   flex-direction: column;
@@ -2869,7 +2942,7 @@ section#apps {
 .mb-h {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(24px, 2.4vw, 30px);
+  font-size: clamp(24px, 2.4vw, 32px);
   line-height: 1.18;
   letter-spacing: -0.022em;
   color: var(--fg);
@@ -2884,7 +2957,7 @@ section#apps {
   max-width: 72ch;
 }
 .mb-p + .mb-p {
-  margin-top: 14px;
+  margin-top: 16px;
 }
 .mb-p em {
   color: var(--primary);
@@ -2893,7 +2966,7 @@ section#apps {
 }
 .mb-quote {
   margin: 8px 0;
-  padding: 20px 24px;
+  padding: 24px 24px;
   border-left: 2px solid var(--primary);
   background: var(--primary-wash);
   max-width: 72ch;
@@ -2906,20 +2979,115 @@ section#apps {
 }
 .mb-quote cite {
   display: block;
-  margin-top: 10px;
+  margin-top: 8px;
   font-style: normal;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
   letter-spacing: -0.005em;
 }
 .mb-coda {
-  margin-top: 56px;
+  margin-top: var(--section-sub);
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(22px, 2.2vw, 26px);
+  font-size: 24px;
   letter-spacing: -0.018em;
   color: var(--primary);
   text-align: center;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   LEGAL PAGES (Terms / Privacy / Data Privacy)
+   Shares the manifesto cell aesthetic; adds list and clause refinements.
+   ────────────────────────────────────────────────────────────────────────── */
+.lg-updated {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.lg-mailto {
+  color: var(--primary);
+  text-decoration: none;
+}
+.lg-mailto:hover {
+  text-decoration: underline;
+}
+.lg-code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  color: var(--fg);
+  background: var(--primary-wash);
+  padding: 1px 8px;
+}
+/* Mono brand marks (simple-icons / cib / arcticons / fa6-brands).
+   Render in near-ink so they sit cleanly next to full-colour logos. */
+.brand-mono {
+  color: #1a1a1a;
+}
+
+/* ───────── NOT FOUND ───────── */
+.nf-eyebrow {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--mono-ink);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.nf-ctas {
+  margin-top: 32px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.mb-list {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 72ch;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mb-list li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg);
+}
+.mb-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--primary);
+  font-weight: 500;
+}
+.mb-clause {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--primary);
+  letter-spacing: 0;
+  display: block;
+  margin-bottom: 6px;
+}
+.mb-defined {
+  font-family: var(--sans);
+  font-weight: 500;
+  color: var(--fg);
+}
+.mb-callout {
+  margin-top: 4px;
+  padding: 16px 24px;
+  border: 1px dashed var(--hairline-default);
+  background: var(--primary-wash);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg);
+  max-width: 72ch;
+  border-radius: 2px;
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -2927,7 +3095,7 @@ section#apps {
    ────────────────────────────────────────────────────────────────────────── */
 
 .bp-grid {
-  margin-top: 56px;
+  margin-top: var(--section-sub);
   display: grid;
   grid-template-columns: 1fr 1fr;
   border: 1px dashed var(--hairline-default);
@@ -2940,7 +3108,7 @@ section#apps {
 .bp-card {
   display: flex;
   flex-direction: column;
-  padding: 32px 36px 36px;
+  padding: 32px 32px 32px;
   min-height: 320px;
   border-left: 1px dashed var(--hairline-default);
   border-top: 1px dashed var(--hairline-default);
@@ -2977,13 +3145,14 @@ section#apps {
 }
 .bp-card-author {
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: -0.005em;
   color: var(--fg);
 }
 .bp-card-meta {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   letter-spacing: 0;
   color: var(--primary);
@@ -3002,22 +3171,22 @@ section#apps {
 .bp-card-title {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(20px, 2vw, 26px);
+  font-size: clamp(18px, 2vw, 24px);
   line-height: 1.2;
   letter-spacing: -0.022em;
   color: var(--fg);
   text-wrap: balance;
 }
 .bp-card-excerpt {
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.55;
   color: var(--muted);
   max-width: 52ch;
 }
 .bp-empty {
   grid-column: 1 / -1;
-  padding: 56px 0;
-  font-size: 15px;
+  padding: var(--section-sub) 0; /* internal-block: empty-state framing inside the grid */
+  font-size: 16px;
   color: var(--muted);
   text-align: center;
 }

@@ -7,27 +7,6 @@ settings:
 importers:
   .:
     dependencies:
-      "@iconify-json/arcticons":
-        specifier: ^1.2.53
-        version: 1.2.53
-      "@iconify-json/cib":
-        specifier: ^1.2.3
-        version: 1.2.3
-      "@iconify-json/devicon":
-        specifier: ^1.2.62
-        version: 1.2.62
-      "@iconify-json/fa6-brands":
-        specifier: ^1.2.6
-        version: 1.2.6
-      "@iconify-json/logos":
-        specifier: ^1.2.11
-        version: 1.2.11
-      "@iconify-json/simple-icons":
-        specifier: ^1.2.81
-        version: 1.2.81
-      "@iconify-json/skill-icons":
-        specifier: ^1.2.4
-        version: 1.2.4
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -40,13 +19,25 @@ importers:
       react-dom:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
-      simple-icons:
-        specifier: ^16.18.1
-        version: 16.18.1
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.5.0
     devDependencies:
+      "@iconify-json/arcticons":
+        specifier: ^1.2.53
+        version: 1.2.53
+      "@iconify-json/cib":
+        specifier: ^1.2.3
+        version: 1.2.3
+      "@iconify-json/fa6-brands":
+        specifier: ^1.2.6
+        version: 1.2.6
+      "@iconify-json/logos":
+        specifier: ^1.2.11
+        version: 1.2.11
+      "@iconify-json/simple-icons":
+        specifier: ^1.2.81
+        version: 1.2.81
       "@tailwindcss/postcss":
         specifier: ^4
         version: 4.3.0
@@ -210,12 +201,6 @@ packages:
         integrity: sha512-MMvRXVTHt82z3bYN19JDAjv/X8OBNC/1B3I334SV/1nyhdPeeyvJZVoI1cGuNqYznBjMnWxKPtIhhiVgGQ1CzQ==,
       }
 
-  "@iconify-json/devicon@1.2.62":
-    resolution:
-      {
-        integrity: sha512-X0o0+fOJL2t5JTbDCGLRzrmvf8Pv5q8dr86+fW+F/VJ9qvXTtny6lqGIwjE9AY4VTLm3i8f/N+VtRheSW6OkEg==,
-      }
-
   "@iconify-json/fa6-brands@1.2.6":
     resolution:
       {
@@ -232,12 +217,6 @@ packages:
     resolution:
       {
         integrity: sha512-Utjw4sPtoVdbpAQAkC4O0cYpt4ehQZYr6aFHhmvdeW8mQwkINyAe0ogTPqNptSSKogZ2lfgXM8zpuhO961Wnng==,
-      }
-
-  "@iconify-json/skill-icons@1.2.4":
-    resolution:
-      {
-        integrity: sha512-S6iRKHGlGCb/zfx3Isv1TBe5PunbDE5FEwJcaXji60+yRZMrcFFtYEI1xivKqaGKXyVZ508yjGDItsehQdJmSg==,
       }
 
   "@iconify/types@2.0.0":
@@ -2764,13 +2743,6 @@ packages:
       }
     engines: { node: ">= 0.4" }
 
-  simple-icons@16.18.1:
-    resolution:
-      {
-        integrity: sha512-+AS16pmdVHFdKrzYuTGfNGW6RRJ7eubpRhh2wipqPD5nglXKKIbAoEFhdxuweR1AV63+TuLXVJ+NEqlJpXXa2A==,
-      }
-    engines: { node: ">=0.12.18" }
-
   source-map-js@1.2.1:
     resolution:
       {
@@ -3137,10 +3109,6 @@ snapshots:
     dependencies:
       "@iconify/types": 2.0.0
 
-  "@iconify-json/devicon@1.2.62":
-    dependencies:
-      "@iconify/types": 2.0.0
-
   "@iconify-json/fa6-brands@1.2.6":
     dependencies:
       "@iconify/types": 2.0.0
@@ -3150,10 +3118,6 @@ snapshots:
       "@iconify/types": 2.0.0
 
   "@iconify-json/simple-icons@1.2.81":
-    dependencies:
-      "@iconify/types": 2.0.0
-
-  "@iconify-json/skill-icons@1.2.4":
     dependencies:
       "@iconify/types": 2.0.0
 
@@ -4800,8 +4764,6 @@ snapshots:
       side-channel-list: 1.0.1
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
-
-  simple-icons@16.18.1: {}
 
   source-map-js@1.2.1: {}
 

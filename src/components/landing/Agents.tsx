@@ -2,15 +2,16 @@ import {
   ChatGPTMark,
   ClaudeMark,
   CursorMark,
-  LangGraphMark,
+  PerplexityMark,
 } from "./brand-icons";
+import Link from "next/link";
 import { DarkBackdrop } from "./DarkBackdrop";
 
 const partners = [
   { name: "Claude", Icon: ClaudeMark },
   { name: "Cursor", Icon: CursorMark },
   { name: "ChatGPT", Icon: ChatGPTMark },
-  { name: "LangGraph", Icon: LangGraphMark },
+  { name: "Perplexity", Icon: PerplexityMark },
 ];
 
 export default function Agents() {
@@ -32,7 +33,7 @@ export default function Agents() {
           <div>
             <h2>Your agents deserve the same memory.</h2>
             <p>
-              The Sentra context graph is exposed as a REST API and MCP server —
+              The Sentra context graph is exposed as a REST API and MCP server,
               so your agents read from the same memory as your team.
             </p>
             <div className="runs-on">
@@ -45,10 +46,10 @@ export default function Agents() {
                   </span>
                 ))}
               </div>
-              <a href="/integrations" className="btn btn-solid runs-cta">
-                All integrations →
-              </a>
             </div>
+            <Link href="/integrations" className="btn btn-solid runs-cta">
+              View all integrations
+            </Link>
           </div>
 
           <div className="code-window" aria-hidden="true">

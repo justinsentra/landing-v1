@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DEMO_HREF, DEMO_LABEL } from "@/data/site";
 import { SentraMark } from "./brand-icons";
@@ -10,6 +11,9 @@ const NAV_BAND = 60;
 const BAND_TOP = NAV_TOP - NAV_BAND;
 const BAND_BOTTOM = NAV_TOP + NAV_BAND + NAV_BAND;
 const BAND_HEIGHT = BAND_BOTTOM - BAND_TOP;
+// Scroll distance over which `--nav-lift` (0 → 1) ramps. Reserved for
+// any glassmorphic intensification keyed on scroll depth; not currently
+// consumed by CSS, but kept so the variable stays writable for future use.
 const LIFT_SCROLL = 80;
 
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
@@ -20,7 +24,20 @@ const navLinks = [
   { href: "/blog", label: "Blog" },
 ];
 
-const LIGHT_ROUTES = ["/research", "/blog", "/manifesto", "/demo"];
+// Routes whose first section is light. Used only to set initialMix so the
+// nav renders at full ink on first paint (no flash of light-on-light text)
+// before the scroll observer hydrates. After hydration, the live mix is
+// driven entirely by section-overlap, which works for all routes.
+const LIGHT_ROUTES = [
+  "/research",
+  "/blog",
+  "/manifesto",
+  "/demo",
+  "/integrations",
+  "/terms",
+  "/privacy",
+  "/data-privacy",
+];
 
 export default function Nav() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -43,15 +60,27 @@ export default function Nav() {
         "section[data-nav-theme]",
       );
 
+      // Clamp the band to the visible portion of the document. The band
+      // intentionally extends above the viewport (BAND_TOP = -44) for
+      // hysteresis on dark→light transitions, but on pages whose first
+      // section is light, that upper region is just empty space above the
+      // document and would otherwise cap coverage at ~75% — leaving the nav
+      // perpetually muted. Treating the area above the document as "absent"
+      // keeps the mix at 1 when the visible band is fully light, while
+      // preserving the natural transition when the user scrolls into a
+      // dark section (FinalCTA, Hero, Agents).
+      const effectiveBandTop = Math.max(BAND_TOP, -window.scrollY);
+      const effectiveBandHeight = Math.max(1, BAND_BOTTOM - effectiveBandTop);
+
       let lightCoverage = 0;
       sections.forEach((s) => {
         if (s.getAttribute("data-nav-theme") !== "light") return;
         const r = s.getBoundingClientRect();
         const overlap = Math.max(
           0,
-          Math.min(r.bottom, BAND_BOTTOM) - Math.max(r.top, BAND_TOP),
+          Math.min(r.bottom, BAND_BOTTOM) - Math.max(r.top, effectiveBandTop),
         );
-        lightCoverage += overlap / BAND_HEIGHT;
+        lightCoverage += overlap / effectiveBandHeight;
       });
 
       const mix = smoothstep(Math.min(1, Math.max(0, lightCoverage)));
@@ -79,13 +108,13 @@ export default function Nav() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <div
       className="nav-wrap"
       ref={wrapRef}
-      data-nav-theme={initialMix === "1" ? "light" : "dark"}
+      data-nav-theme={initialMix === "0" ? "dark" : "light"}
       style={
         {
           ["--nav-mix" as string]: initialMix,
@@ -96,22 +125,22 @@ export default function Nav() {
       <div className="nav-blur" aria-hidden="true" />
       <nav className="nav" data-screen-label="Nav">
         <div className="nav-left">
-          <a href="/" aria-label="Sentra home" className="nav-brand">
+          <Link href="/" aria-label="Sentra home" className="nav-brand">
             <SentraMark className="brand-mark" />
             <span className="wordmark">Sentra</span>
-          </a>
+          </Link>
         </div>
         <div className="nav-mid">
           {navLinks.map((l) => (
-            <a key={l.href} className="nav-link" href={l.href}>
+            <Link key={l.href} className="nav-link" href={l.href}>
               {l.label}
-            </a>
+            </Link>
           ))}
         </div>
         <div className="nav-right">
-          <a className="nav-cta" href={DEMO_HREF}>
+          <Link className="nav-cta" href={DEMO_HREF}>
             {DEMO_LABEL}
-          </a>
+          </Link>
         </div>
       </nav>
     </div>

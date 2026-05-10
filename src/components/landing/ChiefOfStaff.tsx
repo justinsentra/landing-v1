@@ -1,10 +1,11 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 
 type Card = {
   src: string;
   alt: string;
   label: string;
-  title: string;
+  title: ReactNode;
   body: string;
 };
 

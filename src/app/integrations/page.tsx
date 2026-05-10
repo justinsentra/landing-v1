@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Nav from "@/components/landing/Nav";
+import LandingShell from "@/components/landing/LandingShell";
 import { IntegrationsView } from "@/components/landing/IntegrationsView";
-import FinalCTA from "@/components/landing/FinalCTA";
 import { createMetadata } from "@/utils/metadata";
 
 export const metadata: Metadata = createMetadata({
@@ -10,10 +9,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function IntegrationsPage() {
   return (
-    <>
-      <Nav />
+    <LandingShell>
       <IntegrationsView />
-      <FinalCTA />
-    </>
+    </LandingShell>
   );
 }

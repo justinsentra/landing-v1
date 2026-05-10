@@ -1,4 +1,4 @@
-type IconKind = "fingerprint" | "clock" | "shield" | "cloud";
+type IconKind = "vault" | "noTrain" | "shield" | "cloud";
 
 type Card = {
   icon: IconKind;
@@ -9,24 +9,24 @@ type Card = {
 
 const cards: Card[] = [
   {
-    icon: "fingerprint",
-    title: "Provenance on every fact.",
-    body: "Every node and edge carries its source and timestamp. Every answer cites the meeting, doc, or message it came from. No hallucinated history.",
+    icon: "vault",
+    title: "Only what we need",
+    body: "We store the logs and session data required to make Sentra work. Nothing more.",
   },
   {
-    icon: "clock",
-    title: "Temporal correctness.",
-    body: "Old facts are invalidated, not deleted. Ask “what did we believe in Q3?” and Sentra returns the right answer for that point in time.",
+    icon: "noTrain",
+    title: "Never trained on",
+    body: "We do not train models on your data. You pay us for a service, not with your context.",
   },
   {
     icon: "shield",
-    title: "Compliance.",
+    title: "Compliance",
     body: "SOC 2 Type II. ISO 27001. HIPAA on request. Subprocessor list public.",
     highlighted: true,
   },
   {
     icon: "cloud",
-    title: "Deployment.",
+    title: "Deployment",
     body: "Cloud, isolated VPC, or fully air-gapped on-prem. Your data stays where you say it stays.",
   },
 ];
@@ -50,23 +50,21 @@ function Glyph({ kind }: { kind: IconKind }) {
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
   };
-  if (kind === "fingerprint") {
+  if (kind === "vault") {
     return (
       <svg {...stroke}>
-        <path d="M12 11v2a4 4 0 0 0 1.17 2.83" />
-        <path d="M8 12a4 4 0 0 1 8 0v1a10 10 0 0 0 .49 3.1" />
-        <path d="M5.5 11a6.5 6.5 0 0 1 13 0v2a14 14 0 0 0 .35 3" />
-        <path d="M9 17.65a8 8 0 0 1-1-3.65v-2a4 4 0 0 1 .47-1.88" />
-        <path d="M16 19a14.5 14.5 0 0 1-1.5-5.5V12" />
+        <ellipse cx="12" cy="6" rx="7" ry="2.6" />
+        <path d="M5 6v6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6" />
+        <path d="M5 12v6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-6" />
       </svg>
     );
   }
-  if (kind === "clock") {
+  if (kind === "noTrain") {
     return (
       <svg {...stroke}>
-        <path d="M3.05 11A9 9 0 1 1 12 21" />
-        <polyline points="3 4 3 11 10 11" />
-        <polyline points="12 7 12 12 15.5 14" />
+        <path d="M12 4a4 4 0 0 0-4 4v8a4 4 0 0 0 8 0V8a4 4 0 0 0-4-4Z" />
+        <path d="M8 10h8M8 14h8" />
+        <line x1="5" y1="5" x2="19" y2="19" />
       </svg>
     );
   }

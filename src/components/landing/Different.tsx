@@ -14,8 +14,8 @@ const rows: Row[] = [
     left: {
       who: "Context graphs",
       body: [
-        "Most context graphs do the work at query time. When you ask a question, the system has to crawl Slack, then email, then meetings, then docs, and guess how the pieces relate.",
-        "The structure is rediscovered on every request — stale results, missed connections, slow latency.",
+        "Most context graphs do the work at query time. Each question crawls Slack, email, meetings, and docs, then guesses how the pieces relate.",
+        "Structure is rediscovered on every request. Results come back stale and slow.",
       ],
       img: {
         src: "/generated/diff-row1-fragments.png",
@@ -25,8 +25,8 @@ const rows: Row[] = [
     right: {
       who: "Sentra",
       body: [
-        "Sentra builds the graph at ingest. As each interaction lands, we resolve identities, extract entities, and write typed nodes and edges — once, ahead of time.",
-        "By the time you (or any agent) ask a question, the structure already exists. Queries become reads, not reconstructions.",
+        "Sentra builds the graph at ingest. Each interaction is resolved, extracted, and written as typed nodes and edges, ahead of time.",
+        "By the time you ask, the structure already exists. Queries become reads, not reconstructions.",
       ],
       img: {
         src: "/generated/diff-row1-graph.png",
@@ -40,8 +40,8 @@ const rows: Row[] = [
     left: {
       who: "Connectors",
       body: [
-        "Connectors pull artifacts out of SaaS tools — the CRM record, the Jira ticket, the Confluence page. They give you the output of a decision, but never the decision itself.",
-        "The meeting where the deal was renegotiated, the thread where engineering pushed back, the call where the customer escalated — all of it disappears the moment someone writes the ticket.",
+        "Connectors pull artifacts out of SaaS tools: the CRM record, the Jira ticket, the Confluence page. You get the output of a decision, never the decision itself.",
+        "The meeting, the thread, the call where the real work happened all disappear the moment someone writes the ticket.",
       ],
       img: {
         src: "/generated/diff-row2-artifacts.png",
@@ -51,8 +51,8 @@ const rows: Row[] = [
     right: {
       who: "Sentra",
       body: [
-        "Sentra captures interactions as first-class evidence — meetings, Slack threads, emails, calls, agent traces — and links each one to the artifact it produced.",
-        "The CRM entry doesn't just say what changed. It carries the conversation that caused the change. The why travels with the what.",
+        "Sentra captures interactions as first-class evidence: meetings, Slack threads, emails, calls, agent traces. Each one links to the artifact it produced.",
+        "The CRM entry carries the conversation that caused the change. The why travels with the what.",
       ],
       img: {
         src: "/generated/diff-row2-interactions.png",
@@ -66,8 +66,8 @@ const rows: Row[] = [
     left: {
       who: "Keyword search & LLMs",
       body: [
-        'Most systems treat each tool independently. "Sarah Chen" in HubSpot, "S. Chen" in Gmail, and "@schen" in Slack read as three different people with three different histories.',
-        "The model never realizes the same person is escalating in support, negotiating in the deal room, and going quiet in the channel — so it never connects the dots that matter.",
+        'Most systems treat each tool independently. "Sarah Chen" in HubSpot, "S. Chen" in Gmail, and "@schen" in Slack read as three different people.',
+        "The model never sees that the same person is escalating in support, negotiating the deal, and going quiet in the channel.",
       ],
       img: {
         src: "/generated/diff-row3-identity-split.png",
@@ -77,8 +77,8 @@ const rows: Row[] = [
     right: {
       who: "Sentra",
       body: [
-        "Sentra runs continuous, confidence-scored identity resolution across every surface — names, emails, handles, phone numbers, internal IDs — and merges them into one canonical actor.",
-        "When the deal lead pings support, their sales context comes with them. One person, one history, one thread of accountability across the whole company.",
+        "Sentra runs continuous, confidence-scored identity resolution across names, emails, handles, phone numbers, and internal IDs. They merge into one canonical actor.",
+        "When the deal lead pings support, their sales context comes with them. One person, one history.",
       ],
       img: {
         src: "/generated/diff-row3-identity-resolved.png",
@@ -93,7 +93,7 @@ const rows: Row[] = [
       who: "Vector stores & RAG",
       body: [
         "A vector database is a haystack of embeddings. Old facts sit next to new ones with no concept of when each was true.",
-        "Last quarter's renewal date, a reversed product spec, a withdrawn commitment — all retrievable, all equally weighted, all able to confidently restate yesterday's reality as today's truth.",
+        "Last quarter's renewal date, a reversed spec, a withdrawn commitment, all retrievable, all equally weighted, all able to restate yesterday as today's truth.",
       ],
       img: {
         src: "/generated/diff-row1-fragments.png",

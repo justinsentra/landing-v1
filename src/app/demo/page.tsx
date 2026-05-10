@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import Nav from "@/components/landing/Nav";
+import LandingShell from "@/components/landing/LandingShell";
 import { DemoView } from "@/components/landing/DemoView";
-import FinalCTA from "@/components/landing/FinalCTA";
 import { createMetadata } from "@/utils/metadata";
 
 export const metadata: Metadata = createMetadata({ canonical: "/demo" });
 
 export default function DemoPage() {
   return (
-    <>
-      <Nav />
+    <LandingShell>
       <DemoView />
-      <FinalCTA />
-    </>
+    </LandingShell>
   );
 }

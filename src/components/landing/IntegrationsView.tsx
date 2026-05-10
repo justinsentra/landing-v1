@@ -1,38 +1,27 @@
-"use client";
-
-import { useMemo, useState } from "react";
 import { integrations } from "@/data/integrations";
 import { BrandIcon } from "./BrandIcon";
+import { IntegrationsFilter } from "./IntegrationsFilter";
 
-const INITIAL = 36;
-const STEP = 36;
+const CATEGORIES = [
+  "All",
+  ...Array.from(new Set(integrations.map((i) => i.category))).sort(),
+];
 
+/**
+ * Server component. Pre-renders all ~210 integration cards as static HTML
+ * with brand SVGs inlined once. The full grid is handed to the client filter
+ * as `children` (a single static <div>) — NOT as 210 individual ReactElements
+ * — so the RSC payload stays compact and the client never reconciles cards
+ * after hydration. Filtering is DOM-driven (visibility toggles) and operates
+ * on the small `meta` array, which is the only thing the client component
+ * needs to know about each card.
+ */
 export function IntegrationsView() {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<string>("All");
-  const [shown, setShown] = useState(INITIAL);
-
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    integrations.forEach((i) => set.add(i.category));
-    return ["All", ...Array.from(set).sort()];
-  }, []);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return integrations.filter((i) => {
-      if (category !== "All" && i.category !== category) return false;
-      if (!q) return true;
-      return (
-        i.name.toLowerCase().includes(q) ||
-        i.category.toLowerCase().includes(q) ||
-        i.hint.toLowerCase().includes(q)
-      );
-    });
-  }, [query, category]);
-
-  const visible = filtered.slice(0, shown);
-  const hasMore = shown < filtered.length;
+  const meta = integrations.map((i) => ({
+    name: i.name.toLowerCase(),
+    category: i.category,
+    hint: i.hint.toLowerCase(),
+  }));
 
   return (
     <section
@@ -42,71 +31,29 @@ export function IntegrationsView() {
       data-nav-theme="light"
     >
       <div className="container">
-        <div className="int-head">
-          <div className="int-head-title">
-            <h1 className="sec-h">Browse the apps Sentra connects to.</h1>
-            <p className="sec-sub">
-              200+ integrations and counting. Pull context from all your tools.
-            </p>
-          </div>
-          <div className="int-head-controls">
-            <label className="int-search">
-              <span className="int-search-ic" aria-hidden="true">
-                <svg viewBox="0 0 16 16" fill="none">
-                  <circle
-                    cx="7"
-                    cy="7"
-                    r="4.5"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                  />
-                  <path
-                    d="m13.5 13.5-3-3"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <input
-                type="search"
-                placeholder="Search 200+ connected apps"
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setShown(INITIAL);
-                }}
-              />
-            </label>
-            <select
-              className="int-category"
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value);
-                setShown(INITIAL);
-              }}
-            >
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c === "All" ? "All categories" : c}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {filtered.length === 0 ? (
-          <div className="int-empty">
-            No integrations match &ldquo;{query}&rdquo;.
-          </div>
-        ) : (
-          <div className="int-grid bleed-top bleed-bottom">
-            {visible.map((i) => (
-              <article className="int-cell" key={i.name}>
-                <div className="int-cell-head">
-                  <span className="int-ic" aria-hidden="true">
-                    <BrandIcon brandKey={i.key} name={i.name} size={28} />
-                  </span>
+        <IntegrationsFilter
+          heading="Browse the apps Sentra connects to."
+          sub="200+ integrations and counting. Pull context from all your tools."
+          categories={CATEGORIES}
+          totalCount={224}
+          meta={meta}
+        >
+          <div className="int-grid bleed-top bleed-bottom" data-int-grid>
+            {integrations.map((i, idx) => (
+              <article
+                className="int-cell"
+                data-int-cell
+                key={i.name}
+                /* SSR: pre-hide cells beyond the initial page so the first
+                   paint matches the client's default filter state (All,
+                   no query, 36 shown). The client effect takes over once
+                   filters change. */
+                hidden={idx >= 36}
+              >
+                <span className="int-ic" aria-hidden="true">
+                  <BrandIcon brandKey={i.key} name={i.name} size={28} />
+                </span>
+                <div className="int-cell-row">
                   <span className="int-name">{i.name}</span>
                   <span className="int-cat">{i.category}</span>
                 </div>
@@ -114,34 +61,7 @@ export function IntegrationsView() {
               </article>
             ))}
           </div>
-        )}
-
-        {filtered.length > 0 && (
-          <div className="int-foot">
-            <p className="int-count">
-              Showing {visible.length} of {filtered.length}
-            </p>
-            {hasMore ? (
-              <button
-                type="button"
-                className="int-more"
-                onClick={() => setShown((n) => n + STEP)}
-              >
-                View more
-                <span aria-hidden="true">↓</span>
-              </button>
-            ) : shown > INITIAL ? (
-              <button
-                type="button"
-                className="int-more"
-                onClick={() => setShown(INITIAL)}
-              >
-                Collapse
-                <span aria-hidden="true">↑</span>
-              </button>
-            ) : null}
-          </div>
-        )}
+        </IntegrationsFilter>
       </div>
     </section>
   );

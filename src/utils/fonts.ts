@@ -4,7 +4,7 @@ export const geist = Geist({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   display: "swap",
-  variable: "--font-geist",
+  variable: "--font-geist-sans",
 });
 
 export const geistMono = Geist_Mono({
